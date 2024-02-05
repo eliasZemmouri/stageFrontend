@@ -1,0 +1,11 @@
+/* src/ConnexionPage.css */
+.connexion-container {
+    background-color: #eff5fc; /* Bleu clair */
+    color: #1e3a8a; /* Bleu peu foncé */
+  }
+  
+  .card {
+    background-color: #ffffff; /* Blanc */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
