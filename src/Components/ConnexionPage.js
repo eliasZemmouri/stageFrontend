@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './ConnexionPage.css';
+import { useNavigate } from 'react-router-dom';
 
 const ConnexionPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = () => {
     // Vérifier si le chargement est déjà en cours
@@ -24,7 +26,15 @@ const ConnexionPage = () => {
       // Ajoutez ici la logique d'authentification avec un backend si nécessaire
       console.log('Username:', username);
       console.log('Password:', password);
-    }, 2000);
+      const userRole = 'user';
+
+      // Redirigez l'utilisateur en fonction de son rôle
+      if (userRole === 'admin') {
+        navigate('/dashboard'); // Utilisez navigate au lieu de history.push
+      } else {
+        navigate('/rendez-vous-table'); // Utilisez navigate au lieu de history.push
+      }
+    }, 1000);
   };
 
   return (
