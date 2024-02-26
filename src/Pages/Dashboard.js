@@ -1,6 +1,6 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { PieChart, Pie, Sector, ResponsiveContainer as PieResponsiveContainer } from 'recharts';
+import { PieChart, Pie, ResponsiveContainer as PieResponsiveContainer } from 'recharts';
 
 const Dashboard = () => {
   // Exemple de données pour LineChart

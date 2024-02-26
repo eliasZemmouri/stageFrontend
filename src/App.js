@@ -1,11 +1,12 @@
 // App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import ConnexionPage from './Components/ConnexionPage';
-import Dashboard from './Components/Dashboard';
-import RendezVousDataTable from './Components/RendezVousDataTable';
+import ConnexionPage from './Pages/ConnexionPage';
+import Dashboard from './Pages/Dashboard';
+import RendezVousDataTable from './Pages/RendezVousDataTable';
 import { httpClient } from './Api/HttpClient';
 import {initKeycloak,kc} from './Helpers/KeycloakHelper'
+import MySideNav  from "./Components/MySideNav";
 
 
 
@@ -38,10 +39,11 @@ const App = () => {
   return (
     <div>
         <Router>
+          <MySideNav/>
           <Routes>
             <Route path="/login" element={<ConnexionPage />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/" element={<RendezVousDataTable />} />
+            <Route path="/tableau" element={<RendezVousDataTable />} />
           </Routes>
         </Router>
     </div>

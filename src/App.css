@@ -1,9 +1,28 @@
 
 /* App.css */
+*{
+    margin:0;
+    padding:0;
+    text-decoration: none;
+}
+.container{
+    display:flex;
+}
+main{
+    width: 100%;
+    padding: 20px;
+}
 /* RendezVousDataTable.css */
-.rendez-vous-table {
-  height: 400px;
-  width: 100%;
-  border: 1px solid #ddd; /* Ajoutez une bordure */
+.main-container {
+  max-width: calc(100% - 250px); /* Ajustez la largeur selon vos besoins, ici, j'ai supposé que votre sidenav a une largeur de 250px */
+  margin-left: 150px; /* Assurez-vous d'ajuster cela en fonction de la largeur de votre sidenav */
+}
+.custom-table-container {
+  border: 5px solid #ddd;
+  padding: 10px; /* Ajustez la marge intérieure selon vos besoins */
 }
 
+/*NAVIGATOR*/
+.mysidenav{
+  background-color: red;
+}

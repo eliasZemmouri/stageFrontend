@@ -2,8 +2,8 @@
 import Keycloak from 'keycloak-js';
 
 let initOptions = {
-    url: 'http://localhost:8080/auth',
-    realm: 'react-app',
+    url: 'http://localhost:8180/',
+    realm: 'RDV_RENDEZVOUS_CT',
     clientId: 'react-client',
   };
   
