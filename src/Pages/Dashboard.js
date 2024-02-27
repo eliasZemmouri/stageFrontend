@@ -1,69 +1,67 @@
+// Dashboard.js (composant principal)
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { PieChart, Pie, ResponsiveContainer as PieResponsiveContainer } from 'recharts';
+import { ResponsiveContainer } from 'recharts';
+import LineChartComponent from '../Components/DashboardComponents/LineChart';
+import PieChartComponent from '../Components/DashboardComponents/EtatsPieChart';
+import StateBlock from '../Components/DashboardComponents/StateBlock';
+import './Dashboard.css'
+import monImage from '../images/s-a.png'
 
 const Dashboard = () => {
-  // Exemple de données pour LineChart
-  const lineChartData = [
-    { name: 'Jan', uv: 4000, pv: 2400, amt: 2400 },
-    { name: 'Feb', uv: 3000, pv: 1398, amt: 2210 },
-    { name: 'Mar', uv: 2000, pv: 9800, amt: 2290 },
-    { name: 'Apr', uv: 2780, pv: 3908, amt: 2000 },
-    { name: 'May', uv: 1890, pv: 4800, amt: 2181 },
-    { name: 'Jun', uv: 2390, pv: 3800, amt: 2500 },
-    { name: 'Jul', uv: 3490, pv: 4300, amt: 2100 },
+  const statesData = [
+    { stateName: 'COURS', quantity: 120 },
+    { stateName: 'ACCEPTE', quantity: 90 },
+    { stateName: 'REFUSE', quantity: 75 },
+    { stateName: 'RETARD', quantity: 60 },
+    { stateName: 'NOSHOW', quantity: 45 },
+    { stateName: 'ANNULE', quantity: 30 },
   ];
 
-  // Exemple de données pour CustomActiveShapePieChart
-  const pieChartData = [
-    { name: 'Groupe A', value: 400 },
-    { name: 'Groupe B', value: 300 },
-    { name: 'Groupe C', value: 300 },
-    { name: 'Groupe D', value: 200 },
-  ];
-
+  const handleStateClick = (stateName) => {
+    // Handle click for the specific state
+    console.log(`Clicked on ${stateName}`);
+  };
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <h1>Mon Dashboard</h1>
+    
+    <div>
+      
+      <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '150px', marginLeft: '75px' }} />
+      
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      
+        {/* State Blocks */}
+        <div className="state-container">
+          {statesData.map((stateInfo, index) => (
+            <StateBlock
+              key={index}
+              stateName={stateInfo.stateName}
+              quantity={stateInfo.quantity}
+              onClick={() => handleStateClick(stateInfo.stateName)}
+            />
+          ))}
+        </div>
 
-      {/* LineChart */}
-      <ResponsiveContainer width="80%" height={150}>
-        <LineChart data={lineChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
-          <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
-        </LineChart>
-      </ResponsiveContainer>
+        {/* PieChart */}
+        <ResponsiveContainer width="80%" height={160}>
+          <PieChartComponent />
+        </ResponsiveContainer>
 
-      {/* Ajout d'espace entre les deux graphiques */}
-      <div style={{ height: '20px' }}></div>
+        {/* Ajout d'espace entre les graphiques */}
+        <div style={{ height: '200px' }}></div>
 
-      {/* CustomActiveShapePieChart */}
-      <PieResponsiveContainer width="80%" height={150}>
-        <PieChart>
-          <Pie
-            activeIndex={0}
-            activeShape={(props) => renderActiveShape(props, pieChartData)}
-            data={pieChartData}
-            cx="50%"
-            cy="50%"
-            innerRadius={40}
-            outerRadius={60}
-            fill="#8884d8"
-            dataKey="value"
-          />
-        </PieChart>
-      </PieResponsiveContainer>
+        {/* LineChart */}
+        <ResponsiveContainer width="80%" height={200} >
+          <LineChartComponent />
+        </ResponsiveContainer>
+
+
+        {/* Ajout d'espace entre les graphiques */}
+        <div style={{ height: '20px' }}></div>
+
+        {/* ... Ajoute d'autres graphiques ici ... */}
+      </div>
     </div>
   );
-};
-
-const renderActiveShape = (props, data) => {
-  // ... (code de la fonction renderActiveShape)
 };
 
 export default Dashboard;

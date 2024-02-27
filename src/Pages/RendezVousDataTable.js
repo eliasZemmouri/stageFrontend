@@ -7,6 +7,7 @@ import 'primeicons/primeicons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { httpClient } from '../Api/HttpClient';
 import Swal from 'sweetalert2'
+import monImage from '../images/s-a.png'
 
 
 const RendezVousDataTable = () => {
@@ -109,19 +110,22 @@ const RendezVousDataTable = () => {
   
 
   return (
-    <div className="container-fluid mt-4 main-container">
-      <div className="custom-table-container">
-        <DataTable value={data} className="p-datatable-striped" scrollable scrollHeight="calc(100vh - 120px)">
-          <Column field="heure" header="Heure" style={{ width: '5%' }} />
-          <Column field="id" header="Reservation" style={{ width: '10%' }} />
-          <Column field="plaque" header="Plaque" style={{ width: '8%' }} />
-          <Column field="chassis" header="Chassis" style={{ width: '14%' }} />
-          <Column field="source" header="Source" style={{ width: '6%' }} />
-          <Column field="client" header="Client" style={{ width: '15%' }} />
-          <Column field="typeDeVisite" header="Type de Visite" style={{ width: '12%' }} />
-          <Column field="vehicule" header="Véhicule" style={{ width: '15%' }} />
-          <Column body={actionButtons} header="Actions" style={{ width: '23%' }} />
-        </DataTable>
+    <div>
+      <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '150px', marginLeft: '75px' }} />                 
+      <div className="container-fluid mt-4 main-container">
+        <div className="custom-table-container">
+          <DataTable value={data} className="p-datatable-striped" scrollable scrollHeight="calc(100vh - 120px)">
+            <Column field="heure" header="Heure" style={{ width: '5%' }} />
+            <Column field="id" header="Reservation" style={{ width: '10%' }} />
+            <Column field="plaque" header="Plaque" style={{ width: '8%' }} />
+            <Column field="chassis" header="Chassis" style={{ width: '14%' }} />
+            <Column field="source" header="Source" style={{ width: '6%' }} />
+            <Column field="client" header="Client" style={{ width: '15%' }} />
+            <Column field="typeDeVisite" header="Type de Visite" style={{ width: '12%' }} />
+            <Column field="vehicule" header="Véhicule" style={{ width: '15%' }} />
+            <Column body={actionButtons} header="Actions" style={{ width: '23%' }} />
+          </DataTable>
+        </div>
       </div>
     </div>
   );

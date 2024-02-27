@@ -11,6 +11,7 @@ function MySideNav(){
             navigate('/'+selected);
         }}
         className='mysidenav'
+        style={{ userSelect: 'none' }}
         >
             <SideNav.Toggle />
             <SideNav.Nav defaultSelected="home">
