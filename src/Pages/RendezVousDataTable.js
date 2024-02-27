@@ -6,6 +6,8 @@ import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { httpClient } from '../Api/HttpClient';
+import Swal from 'sweetalert2'
+
 
 const RendezVousDataTable = () => {
   const [data, setData] = useState([]);
@@ -16,7 +18,7 @@ const RendezVousDataTable = () => {
       try {
         // Effectuez la requête GET
         const response = await httpClient.get('http://localhost:9005/api/bookings/details');
-        
+
         const bookingDetailsArray = response.data.map(item => item.bookingDetails);
 
         setData(bookingDetailsArray);
@@ -37,23 +39,84 @@ const RendezVousDataTable = () => {
   );
 
   const handleAccept = (rowData) => {
-    // Implementer la logique d'acceptation
+    Swal.fire({
+      title: 'Accepter la réservation',
+      text: 'Veuillez sélectionner une Ligne:',
+      input: 'radio',
+      inputOptions: {
+        'Ligne 1': 'L1',
+        'Ligne 2': 'L2',
+        'Ligne 3': 'L3'
+      },
+      inputValidator: (value) => {
+        if (!value) {
+          return 'Vous devez choisir une Ligne!';
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const ligne = result.value;
+        Swal.fire({
+          html: `Vous avez sélectionné la Ligne: ${ligne}`
+        });
+      }
+    });
     console.log('Accept:', rowData);
   };
 
-  const handleReject = (rowData) => {
-    // Implementer la logique de rejet
+  const handleReject =async (rowData) => {
+    
+    const { value: raison } = await Swal.fire({
+      title: "Selectionne la raison",
+      input: "select",
+      inputOptions: {
+        Danger: {
+          agressif: "Agressif",
+          perturbateur: "Perturbateur"
+        },
+        autre: "Autre Raison"
+      },
+      inputPlaceholder: "Selectionne la raison",
+      showCancelButton: true,
+      inputValidator: (value) => {
+        return new Promise((resolve) => {
+          if (!value) {
+            resolve('Vous devez choisir une raison!');
+          } else {
+            resolve();
+          }
+          
+        });
+      }
+    });
+    if (raison) {
+      try {
+        // Appel de l'API pour refuser le rendez-vous avec l'id et la raison
+        const response = await httpClient.post(`/api/bookings/refuser/${rowData.id}`, { raison });
+        console.log('Réponse de l\'API:', response.data);
+
+        // Afficher un message ou effectuer d'autres actions en fonction de la réponse de l'API
+        Swal.fire('Succès', 'Rendez-vous refusé avec succès.', 'success');
+      } catch (error) {
+        console.error('Erreur lors de l\'appel de l\'API:', error);
+        // Afficher un message d'erreur ou effectuer d'autres actions en cas d'erreur
+        Swal.fire('Erreur', 'Une erreur s\'est produite lors du refus du rendez-vous.', 'error');
+      }
+    }
     console.log('Reject:', rowData);
+
   };
+  
 
   return (
     <div className="container-fluid mt-4 main-container">
       <div className="custom-table-container">
         <DataTable value={data} className="p-datatable-striped" scrollable scrollHeight="calc(100vh - 120px)">
           <Column field="heure" header="Heure" style={{ width: '5%' }} />
-          <Column field="plaque" header="Plaque" style={{ width: '10%' }} />
-          <Column field="chassis" header="Chassis" style={{ width: '20%' }} />
-          <Column field="source" header="Source" style={{ width: '10%' }} />
+          <Column field="id" header="Reservation" style={{ width: '10%' }} />
+          <Column field="plaque" header="Plaque" style={{ width: '8%' }} />
+          <Column field="chassis" header="Chassis" style={{ width: '14%' }} />
+          <Column field="source" header="Source" style={{ width: '6%' }} />
           <Column field="client" header="Client" style={{ width: '15%' }} />
           <Column field="typeDeVisite" header="Type de Visite" style={{ width: '12%' }} />
           <Column field="vehicule" header="Véhicule" style={{ width: '15%' }} />
