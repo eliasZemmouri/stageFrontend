@@ -107,11 +107,57 @@ const RendezVousDataTable = () => {
     console.log('Reject:', rowData);
 
   };
+  const [isButtonClicked, setButtonClicked] = useState(false);
+
+  const handleRefreshClick = () => {
+    // Logique de rechargement ici
+    setButtonClicked(true);
+
+    // Ajouter une pause pour montrer l'effet de clic (peut être ajusté)
+    setTimeout(() => {
+      setButtonClicked(false);
+    }, 200);
+    window.location.reload();
+  };
   
 
   return (
     <div>
-      <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '150px', marginLeft: '75px' }} />                 
+      
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '150px', marginLeft: '75px' }} />
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <button
+            className={`fa fa-fw fa-plus ${isButtonClicked ? 'clicked' : ''}`}
+            style={{
+              fontSize: '1.3em',
+              backgroundColor: '#007BFF',
+              color: 'white',
+              padding: '4px',
+              borderRadius: '4px',
+              border: 'none',
+              boxShadow: isButtonClicked ? '0 0 5px rgba(0, 0, 0, 0.3)' : 'none',
+            }}
+            onClick={handleRefreshClick}
+          />
+          <div style={{ marginLeft: '10px' }}></div> {/* Espace entre le bouton et la liste déroulante */}
+          <button
+            className={`fa fa-fw fa-retweet ${isButtonClicked ? 'clicked' : ''}`}
+            style={{
+              fontSize: '1.5em',
+              backgroundColor: '#007BFF',
+              color: 'white',
+              padding: '2px',
+              borderRadius: '4px',
+              border: 'none',
+              boxShadow: isButtonClicked ? '0 0 5px rgba(0, 0, 0, 0.3)' : 'none',
+            }}
+            onClick={handleRefreshClick}
+          />
+          <div style={{ marginLeft: '10px' }}></div> 
+        </div>
+      </div>
+
       <div className="container-fluid mt-4 main-container">
         <div className="custom-table-container">
           <DataTable value={data} className="p-datatable-striped" scrollable scrollHeight="calc(100vh - 120px)">
