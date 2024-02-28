@@ -76,7 +76,7 @@ const Dashboard = () => {
         value={products}
         paginator
         showGridlines
-        rows={10}
+        rows={5}
         loading={loading}
         dataKey="id"
         filters={filters}

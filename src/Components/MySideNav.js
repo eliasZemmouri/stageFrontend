@@ -14,7 +14,11 @@ function MySideNav(){
         style={{ userSelect: 'none' }}
         >
             <SideNav.Toggle />
-            <SideNav.Nav defaultSelected="home">
+            <SideNav.Nav defaultSelected=" ">
+                <NavItem eventKey="">
+                    <NavIcon><i className='fa fa-fw fa-home' style={{fontSize:"1.5em"}}></i></NavIcon>
+                    <NavText>Tableau</NavText>
+                </NavItem>
                 <NavItem eventKey="tableau">
                     <NavIcon><i className='fa fa-fw fa-columns' style={{fontSize:"1.5em"}}></i></NavIcon>
                     <NavText>Tableau</NavText>
@@ -27,12 +31,12 @@ function MySideNav(){
                     <NavIcon><i className='fa fa-fw fa-gear' style={{fontSize:"1.5em"}}></i></NavIcon>
                     <NavText>Parametres</NavText>
                 </NavItem>
-                <div style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
-                    <NavItem eventKey="logout">
-                        <NavIcon><i className='fa fa-fw fa-sign-out' style={{ fontSize: "1.5em" }}></i></NavIcon>
-                        <NavText>Logout</NavText>
-                    </NavItem>
-                </div>
+                
+                <NavItem eventKey="logout">
+                    <NavIcon><i className='fa fa-fw fa-sign-out' style={{ fontSize: "1.5em" }}></i></NavIcon>
+                    <NavText>Logout</NavText>
+                </NavItem>
+                
             </SideNav.Nav>
         </SideNav>
     );
