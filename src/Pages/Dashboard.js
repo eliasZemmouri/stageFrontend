@@ -76,7 +76,7 @@ const Dashboard = () => {
         value={products}
         paginator
         showGridlines
-        rows={5}
+        rows={4}
         loading={loading}
         dataKey="id"
         filters={filters}
@@ -90,6 +90,10 @@ const Dashboard = () => {
           <Column field="category" header="Category"></Column>
           <Column field="capsule" header="Capsule"></Column>
           <Column field="name" header="Other Name"></Column>
+          <Column field="capsule" header="Capsule"></Column>
+          <Column field="capsule" header="Capsule"></Column>
+          <Column field="capsule" header="Capsule"></Column>
+          <Column field="capsule" header="Capsule"></Column>
         </DataTable>
       </div>
     );
@@ -98,6 +102,7 @@ const Dashboard = () => {
       title: `Cliqué sur ${stateName}`,
       html: productsTable,
       confirmButtonText: 'Fermer',
+      width:'60%',
     });
   };
   const handleDropdownChange = (selectedOption) => {
@@ -134,7 +139,7 @@ const Dashboard = () => {
               </option>
             ))}
           </select>
-          <div style={{ marginLeft: '10px' }}></div> {/* Espace entre le bouton et la liste déroulante */}
+          <div style={{ marginLeft: '5px' }}></div> {/* Espace entre le bouton et la liste déroulante */}
           <button
             className={`fa fa-fw fa-retweet ${isButtonClicked ? 'clicked' : ''}`}
             style={{
@@ -168,17 +173,17 @@ const Dashboard = () => {
         </div>
 
         {/* PieChart */}
-        <ResponsiveContainer width="80%" height={160}>
+        <ResponsiveContainer width="80%" height={130}>
           <PieChartComponent />
         </ResponsiveContainer>
 
         {/* Ajout d'espace entre les graphiques */}
-        <div style={{ height: '170px' }}></div>
+        <div style={{ height: '175px' }}></div>
 
          {/* LineChart and BarChart on the same line */}
          <div style={{ display: 'flex', width: '80%' }}>
           {/* LineChart */}
-          <ResponsiveContainer width="50%" height={300}>
+          <ResponsiveContainer width="50%" height={200}>
             <LineChartComponent />
           </ResponsiveContainer>
 
@@ -186,7 +191,7 @@ const Dashboard = () => {
           <div style={{ width: '20px' }}></div>
 
           {/* BarChart */}
-          <ResponsiveContainer width="50%" height={300}>
+          <ResponsiveContainer width="50%" height={200}>
             <BarChart />
           </ResponsiveContainer>
         </div>

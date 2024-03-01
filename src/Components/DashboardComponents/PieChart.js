@@ -51,17 +51,35 @@ class Example extends PureComponent {
         {/* Paire 1 */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', borderRight: '1px solid #ccc' }}>
           {/* Tableau 1 */}
-          <div style={{ flex: 1, marginRight: '10px' }}>
-            <h5>Etats Rendez-vous</h5>
-            <ul>
-              <li>En cours: Bleu</li>
-              <li>Accepte: Vert foncé</li>
-              <li>Refuse: Jaune</li>
-              <li>Retard: Rouge</li>
-              <li>No show: Vert clair</li>
-              <li>Annule: Rose</li>
-            </ul>
-          </div>
+    <div style={{ flex: 1, marginRight: '10px' }}>
+      <h5>Etats Rendez-vous</h5>
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ width: '20px', height: '20px', backgroundColor: '#0088FE', marginRight: '5px' }}></div>
+          <div>En cours</div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ width: '20px', height: '20px', backgroundColor: '#00C49F', marginRight: '5px' }}></div>
+          <div>Accepte</div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ width: '20px', height: '20px', backgroundColor: '#FFBB28', marginRight: '5px' }}></div>
+          <div>Refuse</div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ width: '20px', height: '20px', backgroundColor: '#FF8042', marginRight: '5px' }}></div>
+          <div>Retard</div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ width: '20px', height: '20px', backgroundColor: '#42ff65', marginRight: '5px' }}></div>
+          <div>No show</div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ width: '20px', height: '20px', backgroundColor: '#ff42d6', marginRight: '5px' }}></div>
+          <div>Annule</div>
+        </div>
+      </div>
+    </div>
           {/* Chart 1 */}
           <div style={{ flex: 1 }}>
             <ResponsiveContainer width="100%" height={200}>
@@ -88,14 +106,23 @@ class Example extends PureComponent {
         {/* Paire 2 */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', borderRight: '1px solid #ccc' }}>
           {/* Tableau 2 */}
-          <div style={{ flex: 1, marginRight: '10px' }}>
-            <h5>Retards</h5>
-            <ul>
-              <li>&lsaquo; 15: Bleu</li>
-              <li>&lsaquo; 30: Vert</li>
-              <li>&rsaquo; 30: Jaune</li>
-            </ul>
+        <div style={{ flex: 1, marginRight: '10px' }}>
+          <h5>Retards</h5>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ width: '20px', height: '20px', backgroundColor: '#0088FE', marginRight: '5px' }}></div>
+              <div>&lsaquo; 15</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ width: '20px', height: '20px', backgroundColor: '#00C49F', marginRight: '5px' }}></div>
+              <div>&lsaquo; 30</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ width: '20px', height: '20px', backgroundColor: '#FFBB28', marginRight: '5px' }}></div>
+              <div>&rsaquo; 30</div>
+            </div>
           </div>
+        </div>
           {/* Chart 2 */}
           <div style={{ flex: 1 }}>
             <ResponsiveContainer width="100%" height={200}>
@@ -122,14 +149,23 @@ class Example extends PureComponent {
         {/* Paire 3 */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'row', padding: '20px' }}>
           {/* Tableau 3 */}
-          <div style={{ flex: 1, marginRight: '10px' }}>
-            <h5>Temps d'attente</h5>
-            <ul>
-              <li>&lsaquo; 15: Bleu</li>
-              <li>&lsaquo; 30: Vert</li>
-              <li>&rsaquo; 30: Jaune</li>
-            </ul>
+        <div style={{ flex: 1, marginRight: '10px' }}>
+          <h5>Retards</h5>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ width: '20px', height: '20px', backgroundColor: '#0088FE', marginRight: '5px' }}></div>
+              <div>&lsaquo; 15</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ width: '20px', height: '20px', backgroundColor: '#00C49F', marginRight: '5px' }}></div>
+              <div>&lsaquo; 30</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ width: '20px', height: '20px', backgroundColor: '#FFBB28', marginRight: '5px' }}></div>
+              <div>&rsaquo; 30</div>
+            </div>
           </div>
+        </div>
           {/* Chart 3 */}
           <div style={{ flex: 1 }}>
             <ResponsiveContainer width="100%" height={200}>

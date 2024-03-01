@@ -2,9 +2,10 @@
 import Keycloak from 'keycloak-js';
 
 let initOptions = {
-    url: 'http://localhost:8180/',
+    url: 'http://192.168.110.106:8180/',
     realm: 'RDV_RENDEZVOUS_CT',
     clientId: 'react-client',
+    'enable-cors': true,
   };
   
 let kc = new Keycloak(initOptions);

@@ -1,14 +1,25 @@
 import SideNav, { NavItem,NavIcon,NavText } from '@trendmicro/react-sidenav';
 import '@trendmicro/react-sidenav/dist/react-sidenav.css';
 import { useNavigate } from 'react-router-dom';
+import {kc} from '../Helpers/KeycloakHelper'
+
 
 function MySideNav(){
     const navigate= useNavigate();
+    const handleLogout = () => {
+        // Appeler kc.logout pour déconnecter l'utilisateur
+        kc.logout();
+      };
     return (
     <SideNav
         onSelect={(selected)=>{
             console.log(selected);
-            navigate('/'+selected);
+            if (selected === 'logout') {
+                // Si l'élément sélectionné est "logout", effectuer la déconnexion
+                handleLogout();
+              } else {
+                navigate('/' + selected);
+              }
         }}
         className='mysidenav'
         style={{ userSelect: 'none' }}

@@ -18,7 +18,8 @@ const RendezVousDataTable = () => {
     const fetchData = async () => {
       try {
         // Effectuez la requête GET
-        const response = await httpClient.get('http://localhost:9005/api/bookings/details');
+        const response = await httpClient.get('http://192.168.110.106:9005/api/bookings/details');
+
 
         const bookingDetailsArray = response.data.map(item => item.bookingDetails);
 
@@ -35,6 +36,7 @@ const RendezVousDataTable = () => {
   const actionButtons = (rowData) => (
     <div>
       <button className="btn btn-success" onClick={() => handleAccept(rowData)}>Valider</button>
+      <span style={{ margin: '10px' }}></span>
       <button className="btn btn-danger" onClick={() => handleReject(rowData)}>Refuser</button>
     </div>
   );
@@ -125,7 +127,7 @@ const RendezVousDataTable = () => {
     <div>
       
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '150px', marginLeft: '75px' }} />
+        <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px', marginLeft: '75px' }} />
         <div style={{ display: 'flex', alignItems: 'center' }}>
         <button
             className={`fa fa-fw fa-plus ${isButtonClicked ? 'clicked' : ''}`}
@@ -160,7 +162,7 @@ const RendezVousDataTable = () => {
 
       <div className="container-fluid mt-4 main-container">
         <div className="custom-table-container">
-          <DataTable value={data} className="p-datatable-striped" scrollable scrollHeight="calc(100vh - 120px)">
+          <DataTable value={data} stripedRows className="p-datatable-striped" scrollable scrollHeight="calc(100vh - 120px)">
             <Column field="heure" header="Heure" style={{ width: '5%' }} />
             <Column field="id" header="Reservation" style={{ width: '10%' }} />
             <Column field="plaque" header="Plaque" style={{ width: '8%' }} />
