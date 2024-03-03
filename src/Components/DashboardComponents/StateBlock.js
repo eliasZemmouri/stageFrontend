@@ -2,6 +2,7 @@
 import React from 'react';
 
 const StateBlock = ({ stateName, quantity, onClick }) => {
+  
   return (
     <div
       className="state-block"

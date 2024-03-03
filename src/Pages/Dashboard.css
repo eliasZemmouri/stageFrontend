@@ -8,16 +8,17 @@
   }
   
   .state-block {
-    border: 1px solid #ccc;
     padding: 20px;
     margin: 20px;
     cursor: pointer;
     flex: 1; /* Utilise l'unité flex pour que les blocs s'étirent */
     box-sizing: border-box;
-    border-radius: 8px;
+    border-radius: 20px;
     transition: box-shadow 0.3s;
     overflow: hidden;
     user-select: none;
+    background-color: white;
+    box-shadow:0 4px 8px rgba(0, 0, 0, 0.1) ;
   }
   
   .state-block:hover {
@@ -25,8 +26,10 @@
   }
   
   .state-name {
-    font-size: 20px;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
     margin-bottom: 5px;
+    color: rgb(108, 134, 134);
   }
   
   .quantity {
@@ -40,4 +43,6 @@
       flex: 0 0 20%; /* Sur des écrans plus petits, les blocs prendront 100% de la largeur */
     }
   }
+
+  
   

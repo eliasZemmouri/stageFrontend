@@ -3,7 +3,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './Pages/Dashboard';
 import RendezVousDataTable from './Pages/RendezVousDataTable';
-import HomePage from './Pages/HomePage';
 import SettingsPage from './Pages/ParametresPage';
 import { httpClient } from './Api/HttpClient';
 import {initKeycloak,kc} from './Helpers/KeycloakHelper'
@@ -42,9 +41,8 @@ const App = () => {
         <Router>
           <MySideNav/>
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<RendezVousDataTable />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/tableau" element={<RendezVousDataTable />} />
             <Route path="/parametres" element={<SettingsPage />} />
           </Routes>
         </Router>

@@ -3,20 +3,20 @@
 import React, { useState } from 'react';
 import monImage from '../images/s-a.png';
 import './ParametresPage.css';
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 
 const SettingsPage = () => {
   // État local pour stocker les données du PieChart
   const [chart1Data, setChart1Data] = useState([
-    { name: 'Bleu', value: 15 },
-    { name: 'Vert', value: 30 },
-    { name: 'Jaune', value: 30 },
+    { name: 'Petit', value: 15 },
+    { name: 'Moyen', value: 30 },
+    { name: 'Grand', value: 30 },
   ]);
 
   const [chart2Data, setChart2Data] = useState([
-    { name: 'Rouge', value: 20 },
-    { name: 'Jaune', value: 25 },
-    { name: 'Vert', value: 35 },
+    { name: 'Petit', value: 20 },
+    { name: 'Moyen', value: 25 },
+    { name: 'Grand', value: 35 },
   ]);
 
   // Fonction pour mettre à jour les données du PieChart
@@ -35,77 +35,77 @@ const SettingsPage = () => {
       }
     }
   };
+
   const handleSaveClick = (chartIndex) => {
     // Logique de sauvegarde ici
     console.log(`Données du tableau ${chartIndex} enregistrées !`);
     const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        }
-      });
-      Toast.fire({
-        icon: "success",
-        title: "Signed in successfully"
-      });
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      },
+    });
+    Toast.fire({
+      icon: 'success',
+      title: 'Signed in successfully',
+    });
   };
 
   return (
-    <div style={{ marginLeft: '75px' }}>
-      <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '150px' }} />
-      <header>
-        <h1>Paramètres</h1>
-      </header>
-      <main>
-        <section>
-          <h2>Retard</h2>
-          <ul>
-            {chart1Data.map((item, index) => (
-              <li key={index}>
-                {index > 0 && <span>&lsaquo; </span>}
-                {index < chart1Data.length - 1 && <span>&rsaquo; </span>}
-                {`${item.value}: ${item.name}`}
-                <input
-                  type="number"
-                  value={item.value}
-                  onChange={(e) => handleDataUpdate(1, index, e.target.value)}
-                />
-              </li>
-            ))}
-          </ul>
-          {/* Bouton Enregistrer pour le tableau Retard */}
-          <button className="save-button" onClick={() => handleSaveClick(1)}>
-            Enregistrer
-          </button>
-        </section>
+    <div className="page-container" style={{ maxWidth: '100%', height: 'auto', width: '250px', marginLeft: '75px' }}>
+      <div className="header-container">
+        <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px' }} />
+        <h2>Paramètres</h2>
+      </div>
 
-        <section>
-          <h2>Temps Attente</h2>
-          <ul>
-            {chart2Data.map((item, index) => (
-              <li key={index}>
-                {index > 0 && <span>&lsaquo; </span>}
-                {index < chart2Data.length - 1 && <span>&rsaquo; </span>}
-                {`${item.value}: ${item.name}`}
-                <input
-                  type="number"
-                  value={item.value}
-                  onChange={(e) => handleDataUpdate(2, index, e.target.value)}
-                />
-              </li>
-            ))}
-          </ul>
-          {/* Bouton Enregistrer pour le tableau Temps Attente */}
-          <button className="save-button" onClick={() => handleSaveClick(2)}>
-            Enregistrer
-          </button>
-        </section>
-      </main>
+      <div className="section-container">
+        <h2>Retard</h2>
+        <ul>
+          {chart1Data.map((item, index) => (
+            <li key={index}>
+              {index > 0 && <span>&lsaquo; </span>}
+              {index < chart1Data.length - 1 && <span>&rsaquo; </span>}
+              {`${item.value}: ${item.name}`}
+              <input
+                type="number"
+                value={item.value}
+                onChange={(e) => handleDataUpdate(1, index, e.target.value)}
+              />
+            </li>
+          ))}
+        </ul>
+        {/* Bouton Enregistrer pour le tableau Retard */}
+        <button className="save-button" onClick={() => handleSaveClick(1)}>
+          Enregistrer
+        </button>
+      </div>
+
+      <div className="section-container">
+        <h2>Temps Attente</h2>
+        <ul>
+          {chart2Data.map((item, index) => (
+            <li key={index}>
+              {index > 0 && <span>&lsaquo; </span>}
+              {index < chart2Data.length - 1 && <span>&rsaquo; </span>}
+              {`${item.value}: ${item.name}`}
+              <input
+                type="number"
+                value={item.value}
+                onChange={(e) => handleDataUpdate(2, index, e.target.value)}
+              />
+            </li>
+          ))}
+        </ul>
+        {/* Bouton Enregistrer pour le tableau Temps Attente */}
+        <button className="save-button" onClick={() => handleSaveClick(2)}>
+          Enregistrer
+        </button>
+      </div>
     </div>
   );
 };

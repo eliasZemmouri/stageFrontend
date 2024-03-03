@@ -132,25 +132,25 @@ const RendezVousDataTable = () => {
         <button
             className={`fa fa-fw fa-plus ${isButtonClicked ? 'clicked' : ''}`}
             style={{
-              fontSize: '1.3em',
+              fontSize: '2em',
               backgroundColor: '#007BFF',
               color: 'white',
               padding: '4px',
-              borderRadius: '4px',
+              borderRadius: '20px',
               border: 'none',
               boxShadow: isButtonClicked ? '0 0 5px rgba(0, 0, 0, 0.3)' : 'none',
             }}
             onClick={handleRefreshClick}
           />
-          <div style={{ marginLeft: '10px' }}></div> {/* Espace entre le bouton et la liste déroulante */}
+          <div style={{ marginLeft: '25px' }}></div> {/* Espace entre le bouton et la liste déroulante */}
           <button
             className={`fa fa-fw fa-retweet ${isButtonClicked ? 'clicked' : ''}`}
             style={{
-              fontSize: '1.5em',
+              fontSize: '2em',
               backgroundColor: '#007BFF',
               color: 'white',
-              padding: '2px',
-              borderRadius: '4px',
+              padding: '4px',
+              borderRadius: '20px',
               border: 'none',
               boxShadow: isButtonClicked ? '0 0 5px rgba(0, 0, 0, 0.3)' : 'none',
             }}

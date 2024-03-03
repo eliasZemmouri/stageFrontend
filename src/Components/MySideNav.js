@@ -18,20 +18,21 @@ function MySideNav(){
                 // Si l'élément sélectionné est "logout", effectuer la déconnexion
                 handleLogout();
               } else {
-                navigate('/' + selected);
+                if(selected==="tableau"){
+                    navigate('/');
+                }else{
+                    navigate('/' + selected);
+                }
+                
               }
         }}
         className='mysidenav'
         style={{ userSelect: 'none' }}
         >
             <SideNav.Toggle />
-            <SideNav.Nav defaultSelected=" ">
-                <NavItem eventKey="">
-                    <NavIcon><i className='fa fa-fw fa-home' style={{fontSize:"1.5em"}}></i></NavIcon>
-                    <NavText>Tableau</NavText>
-                </NavItem>
+            <SideNav.Nav defaultSelected="tableau">
                 <NavItem eventKey="tableau">
-                    <NavIcon><i className='fa fa-fw fa-columns' style={{fontSize:"1.5em"}}></i></NavIcon>
+                    <NavIcon><i className='fa fa-fw fa-home' style={{fontSize:"1.5em"}}></i></NavIcon>
                     <NavText>Tableau</NavText>
                 </NavItem>
                 <NavItem eventKey="dashboard">

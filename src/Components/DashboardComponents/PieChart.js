@@ -46,40 +46,31 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 
 class Example extends PureComponent {
   render() {
+    const borderRadius = '20px';
+    const marginBetweenPairs = '3%';
+    const BoxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+
+    const boxStyle = {
+      boxShadow: BoxShadow,
+      borderRadius,
+    };
+
     return (
-      <div style={{ display: 'flex', margin: '10px', border: '1px solid #ccc' }}>
+      <div style={{ display: 'flex', margin: '10px' }}>
         {/* Paire 1 */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', borderRight: '1px solid #ccc' }}>
+        <div style={{ ...boxStyle, flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', marginRight: marginBetweenPairs, backgroundColor: 'white' }}>
           {/* Tableau 1 */}
-    <div style={{ flex: 1, marginRight: '10px' }}>
-      <h5>Etats Rendez-vous</h5>
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div style={{ width: '20px', height: '20px', backgroundColor: '#0088FE', marginRight: '5px' }}></div>
-          <div>En cours</div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div style={{ width: '20px', height: '20px', backgroundColor: '#00C49F', marginRight: '5px' }}></div>
-          <div>Accepte</div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div style={{ width: '20px', height: '20px', backgroundColor: '#FFBB28', marginRight: '5px' }}></div>
-          <div>Refuse</div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div style={{ width: '20px', height: '20px', backgroundColor: '#FF8042', marginRight: '5px' }}></div>
-          <div>Retard</div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div style={{ width: '20px', height: '20px', backgroundColor: '#42ff65', marginRight: '5px' }}></div>
-          <div>No show</div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div style={{ width: '20px', height: '20px', backgroundColor: '#ff42d6', marginRight: '5px' }}></div>
-          <div>Annule</div>
-        </div>
-      </div>
-    </div>
+          <div style={{ flex: 1, marginRight: '10px' }}>
+            <h5>Etats Rendez-vous</h5>
+            <div>
+              {data.map((item, index) => (
+                <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ width: '20px', height: '20px', backgroundColor: COLORS[index], marginRight: '5px', borderRadius: '50%' }}></div>
+                  <div>{item.name}</div>
+                </div>
+              ))}
+            </div>
+          </div>
           {/* Chart 1 */}
           <div style={{ flex: 1 }}>
             <ResponsiveContainer width="100%" height={200}>
@@ -104,25 +95,19 @@ class Example extends PureComponent {
         </div>
 
         {/* Paire 2 */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', borderRight: '1px solid #ccc' }}>
+        <div style={{ ...boxStyle, flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', marginRight: marginBetweenPairs, backgroundColor: 'white' }}>
           {/* Tableau 2 */}
-        <div style={{ flex: 1, marginRight: '10px' }}>
-          <h5>Retards</h5>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ width: '20px', height: '20px', backgroundColor: '#0088FE', marginRight: '5px' }}></div>
-              <div>&lsaquo; 15</div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ width: '20px', height: '20px', backgroundColor: '#00C49F', marginRight: '5px' }}></div>
-              <div>&lsaquo; 30</div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ width: '20px', height: '20px', backgroundColor: '#FFBB28', marginRight: '5px' }}></div>
-              <div>&rsaquo; 30</div>
+          <div style={{ flex: 1, marginRight: '10px' }}>
+            <h5>Retards</h5>
+            <div>
+              {retards.map((item, index) => (
+                <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ width: '20px', height: '20px', backgroundColor: COLORS[index], marginRight: '5px', borderRadius: '50%' }}></div>
+                  <div>{item.name}</div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
           {/* Chart 2 */}
           <div style={{ flex: 1 }}>
             <ResponsiveContainer width="100%" height={200}>
@@ -147,25 +132,19 @@ class Example extends PureComponent {
         </div>
 
         {/* Paire 3 */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'row', padding: '20px' }}>
+        <div style={{ ...boxStyle, flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', backgroundColor: 'white' }}>
           {/* Tableau 3 */}
-        <div style={{ flex: 1, marginRight: '10px' }}>
-          <h5>Retards</h5>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ width: '20px', height: '20px', backgroundColor: '#0088FE', marginRight: '5px' }}></div>
-              <div>&lsaquo; 15</div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ width: '20px', height: '20px', backgroundColor: '#00C49F', marginRight: '5px' }}></div>
-              <div>&lsaquo; 30</div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ width: '20px', height: '20px', backgroundColor: '#FFBB28', marginRight: '5px' }}></div>
-              <div>&rsaquo; 30</div>
+          <div style={{ flex: 1, marginRight: '10px' }}>
+            <h5>Temps d'attente</h5>
+            <div>
+              {fileAttente.map((item, index) => (
+                <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ width: '20px', height: '20px', backgroundColor: COLORS[index], marginRight: '5px', borderRadius: '50%' }}></div>
+                  <div>{item.name}</div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
           {/* Chart 3 */}
           <div style={{ flex: 1 }}>
             <ResponsiveContainer width="100%" height={200}>

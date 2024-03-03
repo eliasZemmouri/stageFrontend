@@ -9,9 +9,11 @@ const LineChartComponent = () => {
     { name: '13-15h', petit: 20, moyen: 10, grand: 50 },
     { name: '15-17h', petit: 30, moyen: 30, grand: 10 },
   ];
+  
 
   return (
-    <ResponsiveContainer>
+    <ResponsiveContainer height={200}>
+      
       <LineChart data={lineChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />

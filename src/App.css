@@ -2,53 +2,12 @@
 /* App.css */
 body {
   font-family: 'Arial', sans-serif;
-  background-color: #f2f2f2;
+  background-color: #e9f5f5;
   margin: 0;
   padding: 0;
 }
 
-header {
-  background-color: #007BFF;
-  color: white;
-  padding: 20px;
-  text-align: center;
-}
 
-main {
-  display: flex;
-  justify-content: space-between;
-  margin: 0px;
-  padding: 20px;
-}
-
-section {
-  flex: 1;
-  background-color: white;
-  padding: 20px;
-  margin-right: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-h2 {
-  color: #007BFF;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  margin-bottom: 10px;
-}
-
-input {
-  margin-left: 10px;
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
 /* RendezVousDataTable.css */
 .main-container {
   max-width: calc(100% - 250px); /* Ajustez la largeur selon vos besoins, ici, j'ai supposé que votre sidenav a une largeur de 250px */
@@ -61,5 +20,6 @@ input {
 
 /*NAVIGATOR*/
 .mysidenav{
-  background-color: red;
+  background-color: #00adff;
+  height: 100%;
 }

@@ -65,13 +65,13 @@ const Dashboard = () => {
   const header = (
     <div className="table-header">
       <span>Global Search: </span>
-      <InputText type="search" onInput={handleGlobalFilterChange} />
+      <InputText type="search" onInput={handleGlobalFilterChange} style={{textAlignl:'Left'}}/>
     </div>
   );
   const handleStateClick = (stateName) => {
     // Handle click for the specific state
     const productsTable = ReactDOMServer.renderToString(
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <div >
         <DataTable
         value={products}
         paginator
@@ -102,7 +102,7 @@ const Dashboard = () => {
       title: `Cliqué sur ${stateName}`,
       html: productsTable,
       confirmButtonText: 'Fermer',
-      width:'60%',
+      width:'50%',
     });
   };
   const handleDropdownChange = (selectedOption) => {
@@ -125,29 +125,37 @@ const Dashboard = () => {
     }, 200);
     window.location.reload();
   };
+  const borderRadius = '10px';
+  const BoxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+
+  const boxStyle = {
+    boxShadow: BoxShadow,
+    borderRadius,
+  };
+
   return (
     
-    <div>
+    <div style={{userSelect:'none'}}>
       
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '150px', marginLeft: '75px' }} />
+        <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px', marginLeft: '75px' }} />
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <select value={selectedOption} onChange={(e) => handleDropdownChange(e.target.value)}>
+          <select class="form-select" value={selectedOption} onChange={(e) => handleDropdownChange(e.target.value)} style={{borderRadius:'20px'}}>
             {dropdownOptions.map((option, index) => (
               <option key={index} value={option}>
                 {option}
               </option>
             ))}
           </select>
-          <div style={{ marginLeft: '5px' }}></div> {/* Espace entre le bouton et la liste déroulante */}
+          <div style={{ marginLeft: '20px' }}></div> {/* Espace entre le bouton et la liste déroulante */}
           <button
             className={`fa fa-fw fa-retweet ${isButtonClicked ? 'clicked' : ''}`}
             style={{
-              fontSize: '1.5em',
+              fontSize: '2em',
               backgroundColor: '#007BFF',
               color: 'white',
-              padding: '2px',
-              borderRadius: '4px',
+              padding: '4px',
+              borderRadius: '20px',
               border: 'none',
               boxShadow: isButtonClicked ? '0 0 5px rgba(0, 0, 0, 0.3)' : 'none',
             }}
@@ -183,7 +191,13 @@ const Dashboard = () => {
          {/* LineChart and BarChart on the same line */}
          <div style={{ display: 'flex', width: '80%' }}>
           {/* LineChart */}
-          <ResponsiveContainer width="50%" height={200}>
+          
+          
+          <ResponsiveContainer width="50%" height={250} style={{...boxStyle, borderRadius:20,backgroundColor:'white'}}>
+          <div style={{margin:'auto',textAlign:'center'}}>
+          <div style={{ height: '15px' }}></div>
+          <h6>Nombre Visites par type d'attentes</h6>
+          </div>  
             <LineChartComponent />
           </ResponsiveContainer>
 
@@ -191,7 +205,11 @@ const Dashboard = () => {
           <div style={{ width: '20px' }}></div>
 
           {/* BarChart */}
-          <ResponsiveContainer width="50%" height={200}>
+          <ResponsiveContainer width="50%" height={250} style={{...boxStyle, borderRadius:20,backgroundColor:'white'}}>
+          <div style={{margin:'auto',textAlign:'center'}}>
+          <div style={{ height: '15px' }}></div>
+            <h6>Nombre de Visites par Commune</h6>
+          </div>
             <BarChart />
           </ResponsiveContainer>
         </div>
