@@ -2,12 +2,11 @@ import React, { PureComponent } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 const data = [
-  { name: 'En cours', value: 120 },
+  { name: 'Avenir', value: 120 },
   { name: 'Accepte', value: 90 },
   { name: 'Refuse', value: 75 },
   { name: 'Retard', value: 60 },
-  { name: 'No show', value: 45 },
-  { name: 'Annule', value: 30 },
+  { name: 'No show', value: 0 },
 ];
 const retards = [
   { name: '<15', value: 120 },
@@ -98,7 +97,7 @@ class Example extends PureComponent {
         <div style={{ ...boxStyle, flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', marginRight: marginBetweenPairs, backgroundColor: 'white' }}>
           {/* Tableau 2 */}
           <div style={{ flex: 1, marginRight: '10px' }}>
-            <h5>Retards</h5>
+            <h5>Retards (min)</h5>
             <div>
               {retards.map((item, index) => (
                 <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
@@ -135,7 +134,7 @@ class Example extends PureComponent {
         <div style={{ ...boxStyle, flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', backgroundColor: 'white' }}>
           {/* Tableau 3 */}
           <div style={{ flex: 1, marginRight: '10px' }}>
-            <h5>Temps d'attente</h5>
+            <h5>Temps d'attente (min)</h5>
             <div>
               {fileAttente.map((item, index) => (
                 <div key={index} style={{ display: 'flex', alignItems: 'center' }}>

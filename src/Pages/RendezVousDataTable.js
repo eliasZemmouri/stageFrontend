@@ -40,6 +40,11 @@ const RendezVousDataTable = () => {
     { label: 'Refusé', value: 'Refusé' },
     // Ajoutez d'autres états selon vos besoins
   ];
+  const formattedLastUpdate = () => {
+    const now = new Date();
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+    return now.toLocaleDateString('fr-FR', options);
+  };
 
   const handleGlobalFilterChange = (e) => {
     setGlobalFilter(e.target.value);
@@ -150,9 +155,18 @@ const RendezVousDataTable = () => {
   };
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px', marginLeft: '75px' }} />
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginLeft: '75px' }}>
+        {/* Image à gauche */}
+        <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px' }} />
+
+        {/* Conteneur à droite */}
+        <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+          {/* Centrer l'élément <p> */}
+          <div style={{ textAlign: 'center', flex: 1 }}>
+            <p style={{ whiteSpace: 'nowrap', marginTop: '10px', marginLeft: 'auto', marginRight: 'auto' }}>Dernière Maj : {formattedLastUpdate()}</p>
+          </div>
+
+          {/* Bouton Plus */}
           <button
             className="fa fa-fw fa-plus"
             style={{
@@ -166,7 +180,11 @@ const RendezVousDataTable = () => {
             }}
             onClick={handleRefreshClick}
           />
-          <div style={{ marginLeft: '25px' }}></div>
+
+          {/* Espace entre les boutons */}
+          <div style={{ marginLeft: '20px' }}></div>
+
+          {/* Bouton Retweet */}
           <button
             className="fa fa-fw fa-retweet"
             style={{
@@ -180,8 +198,12 @@ const RendezVousDataTable = () => {
             }}
             onClick={handleRefreshClick}
           />
+          <div style={{ marginLeft: '20px' }}></div>
         </div>
       </div>
+
+
+
 
       <div className="container-fluid mt-4 main-container">
         <div className="custom-table-container">

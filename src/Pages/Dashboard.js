@@ -16,20 +16,25 @@ import Papa from 'papaparse';
 const Dashboard = () => {
   const statesData = [
     { stateName: 'AVENIR', quantity: 120 },
-    { stateName: 'PRESENTE', quantity: 90 },
+    { stateName: 'VALIDE', quantity: 90 },
     { stateName: 'REFUSE', quantity: 75 },
-    { stateName: 'NOSHOW', quantity: 45 },
+    { stateName: 'RETARD', quantity: 45 },
+    { stateName: 'NOSHOW', quantity: 0 },
   ];
 
   const products = [
-    { reference: '001', name: 'Product 1', category: 'Category A', capsule: 'Satellite', state: 'ANNULE' },
-    { reference: '002', name: 'Product 2', category: 'Category B', capsule: 'Satellite', state: 'ANNULE' },
-    { reference: '003', name: 'Product 3', category: 'Category B', capsule: 'Satellite', state: 'ANNULE' },
-    { reference: '004', name: 'Product 4', category: 'Category B', capsule: 'Satellite', state: 'ANNULE' },
+    { reference: '001', name: 'Product 1', category: 'Category A', capsule: 'Satellite', state: 'VALIDE' },
+    { reference: '002', name: 'Product 2', category: 'Category B', capsule: 'Satellite', state: 'VALIDE' },
+    { reference: '003', name: 'Product 3', category: 'Category B', capsule: 'Satellite', state: 'VALIDE' },
+    { reference: '004', name: 'Product 4', category: 'Category B', capsule: 'Satellite', state: 'VALIDE' },
     { reference: '005', name: 'Product 5', category: 'Category A', capsule: 'Satellite', state: 'AVENIR' },
     // ... (ajoutez vos autres produits avec l'état correspondant)
   ];
-
+  const formattedLastUpdate = () => {
+    const now = new Date();
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+    return now.toLocaleDateString('fr-FR', options);
+  };
   const [globalFilter, setGlobalFilter] = useState(null);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({});
@@ -115,18 +120,46 @@ const Dashboard = () => {
     }
   };
   return (
-    <div style={{ userSelect: 'none' }}>
+    <div style={{ userSelect: 'none', marginLeft: '75px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px', marginLeft: '75px' }} />
+        {/* Image à gauche */}
+        <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px' }} />
+
+        {/* Conteneur du centre */}
+        <div style={{ flex: 1, textAlign: 'center' }}>
+          <p style={{ whiteSpace: 'nowrap', marginTop: '10px' }}>Dernière Maj : {formattedLastUpdate()}</p>
+        </div>
+
+        {/* Conteneur à droite */}
         <div style={{ display: 'flex', alignItems: 'center' }}>
-        <select class="form-select" value={selectedOption} onChange={(e) => handleDropdownChange(e.target.value)} style={{borderRadius:'20px'}}>
+          {/* Select */}
+          <select
+            className="form-select"
+            value={selectedOption}
+            onChange={(e) => handleDropdownChange(e.target.value)}
+            style={{
+              borderRadius: '20px',
+              padding: '8px 16px',
+              fontSize: '16px',
+              border: '2px solid #007BFF',
+              backgroundColor: 'white',
+              color: '#333',
+              outline: 'none',
+              cursor: 'pointer',
+              width: '150px',
+            }}
+          >
             {dropdownOptions.map((option, index) => (
-              <option key={index} value={option}>
+              <option key={index} value={option} style={{ backgroundColor: '#f5f5f5', color: '#333' }}>
                 {option}
               </option>
             ))}
           </select>
-          <div style={{ marginLeft: '20px' }}></div> {/* Espace entre le bouton et la liste déroulante */}
+
+          {/* Espace entre le select et le bouton */}
+          <div style={{ marginLeft: '20px' }}></div>
+
+          {/* Bouton */}
           <button
             className={`fa fa-fw fa-retweet ${isButtonClicked ? 'clicked' : ''}`}
             style={{
@@ -140,21 +173,27 @@ const Dashboard = () => {
             }}
             onClick={handleRefreshClick}
           />
-          <div style={{ marginLeft: '10px' }}></div> 
         </div>
+        <div style={{ marginLeft: '20px' }}></div>
       </div>
 
+
+
+
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        {/* State Blocks */}
-        <div className="state-container">
-          {statesData.map((stateInfo, index) => (
-            <StateBlock
-              key={index}
-              stateName={stateInfo.stateName}
-              quantity={stateInfo.quantity}
-              onClick={() => handleStateClick(stateInfo.stateName)}
-            />
-          ))}
+        <div>
+          <div style={{border:'1px solid #ccc', display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: '20px', backgroundColor:'white'}}><h4 style={{marginTop: '10px', marginBottom:'10px'}}>Total Rendez-vous : <span style={{ color: '#2BB67D' }}>330</span></h4></div>
+          {/* State Blocks */}
+          <div className="state-container">
+            {statesData.map((stateInfo, index) => (
+              <StateBlock
+                key={index}
+                stateName={stateInfo.stateName}
+                quantity={stateInfo.quantity}
+                onClick={() => handleStateClick(stateInfo.stateName)}
+              />
+            ))}
+          </div>
         </div>
 
         {/* PieChart */}
@@ -191,8 +230,6 @@ const Dashboard = () => {
 
         {/* Ajout d'espace entre les graphiques */}
         <div style={{ height: '20px' }}></div>
-
-        {/* ... Ajoute d'autres graphiques ici ... */}
 
         {/* Conditionnellement afficher le Dialog */}
         {dialogVisible && (
