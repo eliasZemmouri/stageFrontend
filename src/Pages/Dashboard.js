@@ -1,146 +1,125 @@
-// Dashboard.js (composant principal)
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { ResponsiveContainer } from 'recharts';
 import LineChartComponent from '../Components/DashboardComponents/LineChart';
 import PieChartComponent from '../Components/DashboardComponents/PieChart';
 import StateBlock from '../Components/DashboardComponents/StateBlock';
-import './Dashboard.css'
-import monImage from '../images/s-a.png'
-import BarChart from '../Components/DashboardComponents/BarChart'; 
-import Swal from 'sweetalert2'
+import './Dashboard.css';
+import monImage from '../images/s-a.png';
+import BarChart from '../Components/DashboardComponents/BarChart';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
-import 'primereact/resources/themes/saga-blue/theme.css';
-import 'primereact/resources/primereact.min.css';
-import 'primeicons/primeicons.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import ReactDOMServer from 'react-dom/server';
-
+import { Button } from 'primereact/button';
+import Papa from 'papaparse';
 
 const Dashboard = () => {
   const statesData = [
-    { stateName: 'COURS', quantity: 120 },
-    { stateName: 'ACCEPTE', quantity: 90 },
+    { stateName: 'AVENIR', quantity: 120 },
+    { stateName: 'PRESENTE', quantity: 90 },
     { stateName: 'REFUSE', quantity: 75 },
-    { stateName: 'RETARD', quantity: 60 },
     { stateName: 'NOSHOW', quantity: 45 },
-    { stateName: 'ANNULE', quantity: 30 },
   ];
+
   const products = [
-    { reference: '001', name: 'Product 1', category: 'Category A',capsule: 'Satelite'},
-    { reference: '002', name: 'Product 2', category: 'Category B',capsule: 'Satelite'},
-    { reference: '003', name: 'Product 3', category: 'Category A',capsule: 'Satelite'},
-    { reference: '004', name: 'Product 4', category: 'Category C',capsule: 'Satelite' },
-    { reference: '005', name: 'Product 5', category: 'Category B',capsule: 'Satelite' },
-    { reference: '001', name: 'Product 1', category: 'Category A',capsule: 'Satelite'},
-    { reference: '002', name: 'Product 2', category: 'Category B',capsule: 'Satelite'},
-    { reference: '003', name: 'Product 3', category: 'Category A',capsule: 'Satelite'},
-    { reference: '004', name: 'Product 4', category: 'Category C',capsule: 'Satelite' },
-    { reference: '005', name: 'Product 5', category: 'Category B',capsule: 'Satelite' },
-    
+    { reference: '001', name: 'Product 1', category: 'Category A', capsule: 'Satellite', state: 'ANNULE' },
+    { reference: '002', name: 'Product 2', category: 'Category B', capsule: 'Satellite', state: 'ANNULE' },
+    { reference: '003', name: 'Product 3', category: 'Category B', capsule: 'Satellite', state: 'ANNULE' },
+    { reference: '004', name: 'Product 4', category: 'Category B', capsule: 'Satellite', state: 'ANNULE' },
+    { reference: '005', name: 'Product 5', category: 'Category A', capsule: 'Satellite', state: 'AVENIR' },
+    // ... (ajoutez vos autres produits avec l'état correspondant)
   ];
+
   const [globalFilter, setGlobalFilter] = useState(null);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({});
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [selectedState, setSelectedState] = useState(null);
+
+  // Ajout de l'état et des fonctions nécessaires pour la sélection de l'option dans le Dropdown
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [dropdownOptions, setDropdownOptions] = useState(["aujourd'hui","semaine","mois"]); // Remplacez ceci par vos options réelles
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
 
   const handleGlobalFilterChange = (e) => {
     setGlobalFilter(e.target.value);
   };
+
   const customGlobalFilter = (value, filters) => {
     const searchString = (globalFilter || '').toLowerCase();
-  
+
     if (searchString.trim() === '') {
-      return true; // Aucun filtre appliqué
+      return true;
     }
-  
+
     return (
       value.name.toLowerCase().includes(searchString) ||
-      value.country.name.toLowerCase().includes(searchString) ||
-      value.representative.name.toLowerCase().includes(searchString) ||
-      value.balance.toString().toLowerCase().includes(searchString) ||
-      value.status.toLowerCase().includes(searchString)
+      value.category.toLowerCase().includes(searchString) ||
+      value.capsule.toLowerCase().includes(searchString) ||
+      value.reference.toLowerCase().includes(searchString)
     );
   };
+
   const header = (
-    <div className="table-header">
-      <span>Global Search: </span>
-      <InputText type="search" onInput={handleGlobalFilterChange} style={{textAlignl:'Left'}}/>
+    <div className="table-header" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+      <span>Recherche  :</span>
+      <InputText type="search" onInput={handleGlobalFilterChange} style={{ textAlign: 'left' }} />
+      <Button
+        label="Exporter CSV"
+        icon="pi pi-download"
+        onClick={() => exportCSV(getFilteredProductsByState(), selectedState)}
+        style={{ marginLeft: '10px' }}
+      />
     </div>
   );
-  const handleStateClick = (stateName) => {
-    // Handle click for the specific state
-    const productsTable = ReactDOMServer.renderToString(
-      <div >
-        <DataTable
-        value={products}
-        paginator
-        showGridlines
-        rows={4}
-        loading={loading}
-        dataKey="id"
-        filters={filters}
-        globalFilter={globalFilter}
-        header={header}
-        emptyMessage="No customers found."
-        filter={customGlobalFilter}
-      >
-          <Column field="reference" header="Reference"></Column>
-          <Column field="name" header="Name"></Column>
-          <Column field="category" header="Category"></Column>
-          <Column field="capsule" header="Capsule"></Column>
-          <Column field="name" header="Other Name"></Column>
-          <Column field="capsule" header="Capsule"></Column>
-          <Column field="capsule" header="Capsule"></Column>
-          <Column field="capsule" header="Capsule"></Column>
-          <Column field="capsule" header="Capsule"></Column>
-        </DataTable>
-      </div>
-    );
-  
-    Swal.fire({
-      title: `Cliqué sur ${stateName}`,
-      html: productsTable,
-      confirmButtonText: 'Fermer',
-      width:'50%',
-    });
-  };
-  const handleDropdownChange = (selectedOption) => {
-    // Handle dropdown selection change
-    console.log(`Selected option: ${selectedOption}`);
-    setSelectedOption(selectedOption);
+
+  // Ajout de la fonction handleDropdownChange pour gérer la sélection dans le Dropdown
+  const handleDropdownChange = (e) => {
+    if (e.value && e.value.stateName) {
+      setSelectedOption(e.value);
+      setSelectedState(e.value.stateName);
+    }
   };
 
-  const dropdownOptions = ["aujord'hui", 'semaine', 'mois'];
-  const [selectedOption, setSelectedOption] = useState(dropdownOptions[0]);
-  const [isButtonClicked, setButtonClicked] = useState(false);
-
+  // Ajout de la fonction handleRefreshClick pour gérer le clic sur le bouton de rafraîchissement
   const handleRefreshClick = () => {
-    // Logique de rechargement ici
-    setButtonClicked(true);
-
-    // Ajouter une pause pour montrer l'effet de clic (peut être ajusté)
-    setTimeout(() => {
-      setButtonClicked(false);
-    }, 200);
-    window.location.reload();
-  };
-  const borderRadius = '10px';
-  const BoxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-
-  const boxStyle = {
-    boxShadow: BoxShadow,
-    borderRadius,
+    setIsButtonClicked(!isButtonClicked);
   };
 
+  const handleStateClick = (stateName) => {
+    setSelectedState(stateName);
+    setDialogVisible(true);
+  };
+
+  const getFilteredProductsByState = () => {
+    return products.filter((product) => product.state === selectedState);
+  };
+
+  const exportCSV = (data, fileName) => {
+    const csv = Papa.unparse(data);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+
+    if (navigator.msSaveBlob) {
+      navigator.msSaveBlob(blob, fileName);
+    } else {
+      const link = document.createElement('a');
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', fileName);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    }
+  };
   return (
-    
-    <div style={{userSelect:'none'}}>
-      
+    <div style={{ userSelect: 'none' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px', marginLeft: '75px' }} />
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <select class="form-select" value={selectedOption} onChange={(e) => handleDropdownChange(e.target.value)} style={{borderRadius:'20px'}}>
+        <select class="form-select" value={selectedOption} onChange={(e) => handleDropdownChange(e.target.value)} style={{borderRadius:'20px'}}>
             {dropdownOptions.map((option, index) => (
               <option key={index} value={option}>
                 {option}
@@ -165,9 +144,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      
         {/* State Blocks */}
         <div className="state-container">
           {statesData.map((stateInfo, index) => (
@@ -188,16 +165,14 @@ const Dashboard = () => {
         {/* Ajout d'espace entre les graphiques */}
         <div style={{ height: '175px' }}></div>
 
-         {/* LineChart and BarChart on the same line */}
-         <div style={{ display: 'flex', width: '80%' }}>
+        {/* LineChart and BarChart on the same line */}
+        <div style={{ display: 'flex', width: '80%' }}>
           {/* LineChart */}
-          
-          
-          <ResponsiveContainer width="50%" height={250} style={{...boxStyle, borderRadius:20,backgroundColor:'white'}}>
-          <div style={{margin:'auto',textAlign:'center'}}>
-          <div style={{ height: '15px' }}></div>
-          <h6>Nombre Visites par type d'attentes</h6>
-          </div>  
+          <ResponsiveContainer width="50%" height={250} style={{ borderRadius: 20, backgroundColor: 'white' }}>
+            <div style={{ margin: 'auto', textAlign: 'center' }}>
+              <div style={{ height: '15px' }}></div>
+              <h6>Nombre Visites par type d'attentes</h6>
+            </div>
             <LineChartComponent />
           </ResponsiveContainer>
 
@@ -205,20 +180,59 @@ const Dashboard = () => {
           <div style={{ width: '20px' }}></div>
 
           {/* BarChart */}
-          <ResponsiveContainer width="50%" height={250} style={{...boxStyle, borderRadius:20,backgroundColor:'white'}}>
-          <div style={{margin:'auto',textAlign:'center'}}>
-          <div style={{ height: '15px' }}></div>
-            <h6>Nombre de Visites par Commune</h6>
-          </div>
+          <ResponsiveContainer width="50%" height={250} style={{ borderRadius: 20, backgroundColor: 'white' }}>
+            <div style={{ margin: 'auto', textAlign: 'center' }}>
+              <div style={{ height: '15px' }}></div>
+              <h6>Nombre de Visites par Commune</h6>
+            </div>
             <BarChart />
           </ResponsiveContainer>
         </div>
-
 
         {/* Ajout d'espace entre les graphiques */}
         <div style={{ height: '20px' }}></div>
 
         {/* ... Ajoute d'autres graphiques ici ... */}
+
+        {/* Conditionnellement afficher le Dialog */}
+        {dialogVisible && (
+          <Dialog
+            header={`Visites : ${selectedState}`}
+            visible={dialogVisible}
+            style={{ width: '75vw' }}
+            maximizable
+            modal
+            onHide={() => setDialogVisible(false)}
+          >
+            <DataTable
+              value={getFilteredProductsByState()}
+              stripedRows
+              scrollable
+              scrollHeight="flex"
+              tableStyle={{ minWidth: '50rem' }}
+              paginator
+              showGridlines
+              rows={4}
+              loading={loading}
+              dataKey="id"
+              filters={filters}
+              globalFilter={globalFilter}
+              header={header}
+              emptyMessage="No products found."
+              filter={customGlobalFilter}
+            >
+              <Column field="reference" header="Reference"></Column>
+              <Column field="name" header="Name"></Column>
+              <Column field="category" header="Category"></Column>
+              <Column field="capsule" header="Capsule"></Column>
+              <Column field="name" header="Other Name"></Column>
+              <Column field="capsule" header="Capsule"></Column>
+              <Column field="capsule" header="Capsule"></Column>
+              <Column field="capsule" header="Capsule"></Column>
+              <Column field="capsule" header="Capsule"></Column>
+            </DataTable>
+          </Dialog>
+        )}
       </div>
     </div>
   );

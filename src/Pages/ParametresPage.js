@@ -1,38 +1,29 @@
-// SettingsPage.js
-
 import React, { useState } from 'react';
 import monImage from '../images/s-a.png';
 import './ParametresPage.css';
 import Swal from 'sweetalert2';
 
 const SettingsPage = () => {
-  // État local pour stocker les données du PieChart
-  const [chart1Data, setChart1Data] = useState([
-    { name: 'Petit', value: 15 },
-    { name: 'Moyen', value: 30 },
-    { name: 'Grand', value: 30 },
-  ]);
+  const [retardValues, setRetardValues] = useState([0, 0, 0]);
+  const [tempsAttenteValues, setTempsAttenteValues] = useState([0, 0, 0]);
 
-  const [chart2Data, setChart2Data] = useState([
-    { name: 'Petit', value: 20 },
-    { name: 'Moyen', value: 25 },
-    { name: 'Grand', value: 35 },
-  ]);
-
-  // Fonction pour mettre à jour les données du PieChart
-  const handleDataUpdate = (chartIndex, dataIndex, value) => {
-    // Vérifier si la valeur est numérique
-    if (!isNaN(value) && value >= 0) {
-      // Mettre à jour la valeur correspondante
-      if (chartIndex === 1) {
-        const updatedData = [...chart1Data];
-        updatedData[dataIndex].value = parseFloat(value);
-        setChart1Data(updatedData);
-      } else if (chartIndex === 2) {
-        const updatedData = [...chart2Data];
-        updatedData[dataIndex].value = parseFloat(value);
-        setChart2Data(updatedData);
+  const handleInputChange = (section, index, value) => {
+    if (section === 'retard') {
+      const newValues = [...retardValues];
+      newValues[index] = value;
+      // Make sure the last "plus petit que" is greater than or equal to the previous one
+      if (index > 0 && newValues[index] < newValues[index - 1]) {
+        newValues[index] = newValues[index - 1];
       }
+      setRetardValues(newValues);
+    } else if (section === 'tempsAttente') {
+      const newValues = [...tempsAttenteValues];
+      newValues[index] = value;
+      // Make sure the last "plus petit que" is greater than or equal to the previous one
+      if (index > 0 && newValues[index] < newValues[index - 1]) {
+        newValues[index] = newValues[index - 1];
+      }
+      setTempsAttenteValues(newValues);
     }
   };
 
@@ -57,54 +48,82 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="page-container" style={{ maxWidth: '100%', height: 'auto', width: '250px', marginLeft: '75px' }}>
-      <div className="header-container">
-        <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px' }} />
-        <h2>Paramètres</h2>
-      </div>
+    <div style={{ maxWidth: '95%', height: 'auto', marginLeft: '75px' }}>
+      <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px', paddingBottom: '30px' }} />
+      <div className='bloc'>
+        <div className="header-container">
+          <div style={{ marginLeft: '20px' }}><h2>Paramètres</h2></div>
+          <div style={{ marginRight: '20px' }}>
+            <button className="save-button" onClick={() => handleSaveClick(1)}>
+              Enregistrer
+            </button>
+          </div>
+        </div>
+        <div className="page-container" >
+          <div className="section-container">
+            <h2>Retard</h2>
+            <ul>
+              {[0, 1, 2].map((index) => (
+                <li key={index}>
+                  Plus petit que:
+                  <input
+                    type="number"
+                    style={{ width: '20%' }}
+                    value={retardValues[index]}
+                    onChange={(e) => handleInputChange('retard', index, e.target.value)}
+                  />
+                </li>
+              ))}
+              <li>
+                Plus grand que:
+                <input
+                  type="number"
+                  style={{ width: '20%' }}
+                  value={retardValues[2]} // The "Plus grand que" field should be the same as the last "Plus petit que"
+                  readOnly
+                />
+              </li>
+            </ul>
+          </div>
 
-      <div className="section-container">
-        <h2>Retard</h2>
-        <ul>
-          {chart1Data.map((item, index) => (
-            <li key={index}>
-              {index > 0 && <span>&lsaquo; </span>}
-              {index < chart1Data.length - 1 && <span>&rsaquo; </span>}
-              {`${item.value}: ${item.name}`}
-              <input
-                type="number"
-                value={item.value}
-                onChange={(e) => handleDataUpdate(1, index, e.target.value)}
-              />
-            </li>
-          ))}
-        </ul>
-        {/* Bouton Enregistrer pour le tableau Retard */}
-        <button className="save-button" onClick={() => handleSaveClick(1)}>
-          Enregistrer
-        </button>
-      </div>
+          <div className="section-container">
+            <h2>Temps Attente</h2>
+            <ul>
+              {[0, 1, 2].map((index) => (
+                <li key={index}>
+                  Plus petit que:
+                  <input
+                    type="number"
+                    style={{ width: '20%' }}
+                    value={tempsAttenteValues[index]}
+                    onChange={(e) => handleInputChange('tempsAttente', index, e.target.value)}
+                  />
+                </li>
+              ))}
+              <li>
+                Plus grand que:
+                <input
+                  type="number"
+                  style={{ width: '20%' }}
+                  value={tempsAttenteValues[2]} // The "Plus grand que" field should be the same as the last "Plus petit que"
+                  readOnly
+                />
+              </li>
+            </ul>
+          </div>
 
-      <div className="section-container">
-        <h2>Temps Attente</h2>
-        <ul>
-          {chart2Data.map((item, index) => (
-            <li key={index}>
-              {index > 0 && <span>&lsaquo; </span>}
-              {index < chart2Data.length - 1 && <span>&rsaquo; </span>}
-              {`${item.value}: ${item.name}`}
-              <input
-                type="number"
-                value={item.value}
-                onChange={(e) => handleDataUpdate(2, index, e.target.value)}
-              />
-            </li>
-          ))}
-        </ul>
-        {/* Bouton Enregistrer pour le tableau Temps Attente */}
-        <button className="save-button" onClick={() => handleSaveClick(2)}>
-          Enregistrer
-        </button>
+          <div className="section-container">
+            <h2>Durée avant Retard</h2>
+            <ul>
+              <li>
+                temps en minutes avant retard:
+                <input
+                  type="number"
+                  style={{ width: '20%' }} />
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );

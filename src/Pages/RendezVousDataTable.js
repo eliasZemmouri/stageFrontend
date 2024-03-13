@@ -6,38 +6,77 @@ import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { httpClient } from '../Api/HttpClient';
-import Swal from 'sweetalert2'
-import monImage from '../images/s-a.png'
-
+import Swal from 'sweetalert2';
+import monImage from '../images/s-a.png';
 
 const RendezVousDataTable = () => {
   const [data, setData] = useState([]);
+  const [selectedState, setSelectedState] = useState('Avenir');
+  const [globalFilter, setGlobalFilter] = useState('');
 
   useEffect(() => {
-    // Effectué lors du montage du composant
     const fetchData = async () => {
       try {
-        // Effectuez la requête GET
         const response = await httpClient.get('http://192.168.110.106:9005/api/bookings/details');
-
-
-        const bookingDetailsArray = response.data.map(item => item.bookingDetails);
-
+        const bookingDetailsArray = response.data.map((item) => item.bookingDetails);
         setData(bookingDetailsArray);
       } catch (error) {
         console.error('Error fetching data:', error.message);
       }
     };
 
-    // Appelez la fonction pour récupérer les données
     fetchData();
-  }, []); // Le tableau vide en second argument signifie que cet effet ne s'exécute qu'une seule fois lors du montage
+  }, []);
+
+  const handleStateChange = (state) => {
+    setSelectedState(state);
+  };
+
+  const stateOptions = [
+    { label: 'Avenir', value: 'Avenir' },
+    { label: 'Tot', value: 'Tot' },
+    { label: 'Retard', value: 'Retard' },
+    { label: 'Validé', value: 'Validé' },
+    { label: 'Refusé', value: 'Refusé' },
+    // Ajoutez d'autres états selon vos besoins
+  ];
+
+  const handleGlobalFilterChange = (e) => {
+    setGlobalFilter(e.target.value);
+  };
+
+  const handleRefreshClick = () => {
+    window.location.reload();
+  };
+
+  const renderStateButton = (state) => (
+    <button
+      key={state.value}
+      className={`btn ${selectedState === state.value ? 'btn-info' : 'btn-secondary'}`}
+      onClick={() => handleStateChange(state.value)}
+      style={{ marginRight: '30px' }}
+    >
+      {state.label}
+    </button>
+  );
+
+  const stateButtons = stateOptions.map(renderStateButton);
+
+  const globalFilterElement = (
+    <div className="table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ marginLeft: '25px', display: 'flex' }}>{stateButtons}</div>
+    </div>
+  );
 
   const actionButtons = (rowData) => (
     <div>
-      <button className="btn btn-success" onClick={() => handleAccept(rowData)}>Valider</button>
+      <button className="btn btn-success" onClick={() => handleAccept(rowData)}>
+        Valider
+      </button>
       <span style={{ margin: '10px' }}></span>
-      <button className="btn btn-danger" onClick={() => handleReject(rowData)}>Refuser</button>
+      <button className="btn btn-danger" onClick={() => handleReject(rowData)}>
+        Refuser
+      </button>
     </div>
   );
 
@@ -109,42 +148,13 @@ const RendezVousDataTable = () => {
     console.log('Reject:', rowData);
 
   };
-  const [isButtonClicked, setButtonClicked] = useState(false);
-
-  const handleRefreshClick = () => {
-    // Logique de rechargement ici
-    setButtonClicked(true);
-
-    // Ajouter une pause pour montrer l'effet de clic (peut être ajusté)
-    setTimeout(() => {
-      setButtonClicked(false);
-    }, 200);
-    window.location.reload();
-  };
-  
-
   return (
     <div>
-      
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px', marginLeft: '75px' }} />
         <div style={{ display: 'flex', alignItems: 'center' }}>
-        <button
-            className={`fa fa-fw fa-plus ${isButtonClicked ? 'clicked' : ''}`}
-            style={{
-              fontSize: '2em',
-              backgroundColor: '#007BFF',
-              color: 'white',
-              padding: '4px',
-              borderRadius: '20px',
-              border: 'none',
-              boxShadow: isButtonClicked ? '0 0 5px rgba(0, 0, 0, 0.3)' : 'none',
-            }}
-            onClick={handleRefreshClick}
-          />
-          <div style={{ marginLeft: '25px' }}></div> {/* Espace entre le bouton et la liste déroulante */}
           <button
-            className={`fa fa-fw fa-retweet ${isButtonClicked ? 'clicked' : ''}`}
+            className="fa fa-fw fa-plus"
             style={{
               fontSize: '2em',
               backgroundColor: '#007BFF',
@@ -152,17 +162,39 @@ const RendezVousDataTable = () => {
               padding: '4px',
               borderRadius: '20px',
               border: 'none',
-              boxShadow: isButtonClicked ? '0 0 5px rgba(0, 0, 0, 0.3)' : 'none',
+              marginLeft: '10px',
             }}
             onClick={handleRefreshClick}
           />
-          <div style={{ marginLeft: '10px' }}></div> 
+          <div style={{ marginLeft: '25px' }}></div>
+          <button
+            className="fa fa-fw fa-retweet"
+            style={{
+              fontSize: '2em',
+              backgroundColor: '#007BFF',
+              color: 'white',
+              padding: '4px',
+              borderRadius: '20px',
+              border: 'none',
+              marginLeft: '10px',
+            }}
+            onClick={handleRefreshClick}
+          />
         </div>
       </div>
 
       <div className="container-fluid mt-4 main-container">
         <div className="custom-table-container">
-          <DataTable value={data} stripedRows className="p-datatable-striped" scrollable scrollHeight="calc(100vh - 120px)">
+          <DataTable
+            value={data}
+            stripedRows
+            className="p-datatable-striped"
+            scrollable
+            scrollHeight="calc(100vh - 120px)"
+            globalFilter={globalFilter}
+            header={globalFilterElement}
+            emptyMessage="Aucun rendez-vous trouvé."
+          >
             <Column field="heure" header="Heure" style={{ width: '5%' }} />
             <Column field="id" header="Reservation" style={{ width: '10%' }} />
             <Column field="plaque" header="Plaque" style={{ width: '8%' }} />

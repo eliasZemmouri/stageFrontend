@@ -1,22 +1,32 @@
-.page-container {
+.bloc {
+  border: 1px solid #ccc;
   user-select: none;
+  border-radius: 20px;
+  background-color: #b3eef8
+}
+.page-container {
+  width: 100%;
+  padding: 10px;
   display: flex;
-  flex-wrap: wrap;
+  
 }
 
 .section-container {
-  flex: 1;
+  width: 33%;
   margin: 10px;
   padding: 20px;
   border: 1px solid #ccc;
   box-sizing: border-box;
   border-radius: 20px;
   background-color: white;
+  max-width: 40%; /* ou toute autre valeur qui convient */
 }
 
 .header-container {
-  width: 100%;
-  text-align: center;
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between; /* Aligner les éléments au début et à la fin du conteneur */
+  align-items: center; 
 }
 
 ul {
