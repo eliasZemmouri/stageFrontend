@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom'; // Utilisation de useNavigate pour la navigation
 import { ResponsiveContainer } from 'recharts';
 import LineChartComponent from '../Components/DashboardComponents/LineChart';
 import PieChartComponent from '../Components/DashboardComponents/PieChart';
@@ -14,6 +15,14 @@ import { Button } from 'primereact/button';
 import Papa from 'papaparse';
 
 const Dashboard = () => {
+  const navigate = useNavigate(); // Utilisation de useNavigate pour la navigation
+  const location = useLocation();
+
+  
+
+  const handleDashboard2Click = () => {
+    navigate('/dashboard2');
+  };
   const statesData = [
     { stateName: 'AVENIR', quantity: 120 },
     { stateName: 'VALIDE', quantity: 90 },
@@ -45,6 +54,7 @@ const Dashboard = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [dropdownOptions, setDropdownOptions] = useState(["aujourd'hui","semaine","mois"]); // Remplacez ceci par vos options réelles
   const [isButtonClicked, setIsButtonClicked] = useState(false);
+  
 
   const handleGlobalFilterChange = (e) => {
     setGlobalFilter(e.target.value);
@@ -89,6 +99,7 @@ const Dashboard = () => {
   // Ajout de la fonction handleRefreshClick pour gérer le clic sur le bouton de rafraîchissement
   const handleRefreshClick = () => {
     setIsButtonClicked(!isButtonClicked);
+    window.location.reload();
   };
 
   const handleStateClick = (stateName) => {
@@ -177,9 +188,6 @@ const Dashboard = () => {
         <div style={{ marginLeft: '20px' }}></div>
       </div>
 
-
-
-
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <div>
           <div style={{border:'1px solid #ccc', display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: '20px', backgroundColor:'white'}}><h4 style={{marginTop: '10px', marginBottom:'10px'}}>Total Rendez-vous : <span style={{ color: '#2BB67D' }}>330</span></h4></div>
@@ -230,49 +238,75 @@ const Dashboard = () => {
 
         {/* Ajout d'espace entre les graphiques */}
         <div style={{ height: '20px' }}></div>
+      </div>
 
-        {/* Conditionnellement afficher le Dialog */}
-        {dialogVisible && (
-          <Dialog
-            header={`Visites : ${selectedState}`}
-            visible={dialogVisible}
-            style={{ width: '75vw' }}
-            maximizable
-            modal
-            onHide={() => setDialogVisible(false)}
+      {/* Conditionnellement afficher le Dialog */}
+      {dialogVisible && (
+        <Dialog
+          header={`Visites : ${selectedState}`}
+          visible={dialogVisible}
+          style={{ width: '75vw' }}
+          maximizable
+          modal
+          onHide={() => setDialogVisible(false)}
+        >
+          <DataTable
+            value={getFilteredProductsByState()}
+            stripedRows
+            scrollable
+            scrollHeight="flex"
+            tableStyle={{ minWidth: '50rem' }}
+            paginator
+            showGridlines
+            rows={4}
+            loading={loading}
+            dataKey="id"
+            filters={filters}
+            globalFilter={globalFilter}
+            header={header}
+            emptyMessage="No products found."
+            filter={customGlobalFilter}
           >
-            <DataTable
-              value={getFilteredProductsByState()}
-              stripedRows
-              scrollable
-              scrollHeight="flex"
-              tableStyle={{ minWidth: '50rem' }}
-              paginator
-              showGridlines
-              rows={4}
-              loading={loading}
-              dataKey="id"
-              filters={filters}
-              globalFilter={globalFilter}
-              header={header}
-              emptyMessage="No products found."
-              filter={customGlobalFilter}
-            >
-              <Column field="reference" header="Reference"></Column>
-              <Column field="name" header="Name"></Column>
-              <Column field="category" header="Category"></Column>
-              <Column field="capsule" header="Capsule"></Column>
-              <Column field="name" header="Other Name"></Column>
-              <Column field="capsule" header="Capsule"></Column>
-              <Column field="capsule" header="Capsule"></Column>
-              <Column field="capsule" header="Capsule"></Column>
-              <Column field="capsule" header="Capsule"></Column>
-            </DataTable>
-          </Dialog>
-        )}
+            <Column field="reference" header="Reference"></Column>
+            <Column field="name" header="Name"></Column>
+            <Column field="category" header="Category"></Column>
+            <Column field="capsule" header="Capsule"></Column>
+            <Column field="name" header="Other Name"></Column>
+            <Column field="capsule" header="Capsule"></Column>
+            <Column field="capsule" header="Capsule"></Column>
+            <Column field="capsule" header="Capsule"></Column>
+            <Column field="capsule" header="Capsule"></Column>
+          </DataTable>
+        </Dialog>
+      )}
+
+       {/* Boutons en bas de la page */}
+       <div
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          width: '100%',
+          marginLeft: '35px',
+          paddingBottom: '10px',
+          textAlign: 'center',
+        }}
+      >
+        {/* Bouton pour le dashboard 1 */}
+        <Button
+          label="Dashboard 1"
+          className="p-button-info"
+          style={{ marginRight: '10px' }}
+          disabled={location.pathname === '/dashboard'} // Désactiver le bouton si l'URL est '/'
+        />
+        {/* Bouton pour le dashboard 2 */}
+        <Button
+          label="Dashboard 2"
+          className="p-button-info"
+          onClick={handleDashboard2Click}
+        />
       </div>
     </div>
   );
 };
-
 export default Dashboard;

@@ -123,6 +123,56 @@ const SettingsPage = () => {
               </li>
             </ul>
           </div>
+          <div className="section-container">
+            <h2>Temps Attente</h2>
+            <ul>
+              {[0, 1, 2].map((index) => (
+                <li key={index}>
+                  Plus petit que:
+                  <input
+                    type="number"
+                    style={{ width: '20%' }}
+                    value={tempsAttenteValues[index]}
+                    onChange={(e) => handleInputChange('tempsAttente', index, e.target.value)}
+                  />
+                </li>
+              ))}
+              <li>
+                Plus grand que:
+                <input
+                  type="number"
+                  style={{ width: '20%' }}
+                  value={tempsAttenteValues[2]} // The "Plus grand que" field should be the same as the last "Plus petit que"
+                  readOnly
+                />
+              </li>
+            </ul>
+          </div>
+          <div className="section-container">
+            <h2>Temps Attente</h2>
+            <ul>
+              {[0, 1, 2].map((index) => (
+                <li key={index}>
+                  Plus petit que:
+                  <input
+                    type="number"
+                    style={{ width: '20%' }}
+                    value={tempsAttenteValues[index]}
+                    onChange={(e) => handleInputChange('tempsAttente', index, e.target.value)}
+                  />
+                </li>
+              ))}
+              <li>
+                Plus grand que:
+                <input
+                  type="number"
+                  style={{ width: '20%' }}
+                  value={tempsAttenteValues[2]} // The "Plus grand que" field should be the same as the last "Plus petit que"
+                  readOnly
+                />
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>

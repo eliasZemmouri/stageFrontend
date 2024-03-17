@@ -7,6 +7,7 @@ import SettingsPage from './Pages/ParametresPage';
 import { httpClient } from './Api/HttpClient';
 import {initKeycloak,kc} from './Helpers/KeycloakHelper'
 import MySideNav  from "./Components/MySideNav";
+import Dashboard2 from './Pages/Dashboard2';
 
 
 
@@ -44,6 +45,7 @@ const App = () => {
             <Route path="/" element={<RendezVousDataTable />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/parametres" element={<SettingsPage />} />
+            <Route path="/dashboard2" element={<Dashboard2 />} />
           </Routes>
         </Router>
     </div>
