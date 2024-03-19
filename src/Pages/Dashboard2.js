@@ -1,18 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import monImage from '../images/s-a.png';
 import { ResponsiveContainer } from 'recharts';
 import PieChartComponent from '../Components/DashboardComponents/PieChart2';
 
-
-
 const Dashboard2 = () => {
   const navigate = useNavigate();
   const [selectedOption, setSelectedOption] = useState(null);
-  const [dropdownOptions, setDropdownOptions] = useState(["aujourd'hui","semaine","mois"]); // Remplacez ceci par vos options réelles
+  const [selectedSTOption, setSelectedSTOption] = useState(null);
+  const [dropdownOptions, setDropdownOptions] = useState(["aujourd'hui", "semaine", "mois"]);
   const [isButtonClicked, setIsButtonClicked] = useState(false);
   const [selectedState, setSelectedState] = useState(null);
+
+  useEffect(() => {
+    const savedSelectedOption = localStorage.getItem('selectedOption');
+    if (savedSelectedOption) {
+      setSelectedOption(savedSelectedOption);
+    }
+    
+    const savedSelectedSTOption = localStorage.getItem('selectedSTOption');
+    if (savedSelectedSTOption) {
+      setSelectedSTOption(savedSelectedSTOption);
+    }
+  }, []);
 
   const formattedLastUpdate = () => {
     const now = new Date();
@@ -23,40 +34,39 @@ const Dashboard2 = () => {
   const handlePage1Click = () => {
     navigate('/dashboard');
   };
-  // Ajout de la fonction handleDropdownChange pour gérer la sélection dans le Dropdown
+
   const handleDropdownChange = (e) => {
-    if (e.value && e.value.stateName) {
-      setSelectedOption(e.value);
-      setSelectedState(e.value.stateName);
+    if (e.target && e.target.value) {
+      setSelectedOption(e.target.value);
+      setSelectedState(e.target.value);
+      localStorage.setItem('selectedOption', e.target.value);
     }
   };
 
-  // Ajout de la fonction handleRefreshClick pour gérer le clic sur le bouton de rafraîchissement
+  const handleSTOptionChange = (e) => {
+    if (e.target && e.target.value) {
+      setSelectedSTOption(e.target.value);
+      localStorage.setItem('selectedSTOption', e.target.value);
+    }
+  };
+
   const handleRefreshClick = () => {
     setIsButtonClicked(!isButtonClicked);
     window.location.reload();
   };
 
-
   return (
     <div style={{ textAlign: 'center', marginLeft: '75px' }}>
-        
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        {/* Image à gauche */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px' }} />
-
-        {/* Conteneur du centre */}
         <div style={{ flex: 1, textAlign: 'center' }}>
           <p style={{ whiteSpace: 'nowrap', marginTop: '10px' }}>Dernière Maj : {formattedLastUpdate()}</p>
         </div>
-
-        {/* Conteneur à droite */}
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          {/* Select */}
           <select
             className="form-select"
             value={selectedOption}
-            onChange={(e) => handleDropdownChange(e.target.value)}
+            onChange={handleDropdownChange}
             style={{
               borderRadius: '20px',
               padding: '8px 16px',
@@ -75,11 +85,27 @@ const Dashboard2 = () => {
               </option>
             ))}
           </select>
-
-          {/* Espace entre le select et le bouton */}
           <div style={{ marginLeft: '20px' }}></div>
-
-          {/* Bouton */}
+          <select
+            className="form-select"
+            value={selectedSTOption}
+            onChange={handleSTOptionChange}
+            style={{
+              borderRadius: '20px',
+              padding: '8px 16px',
+              fontSize: '16px',
+              border: '2px solid #007BFF',
+              backgroundColor: 'white',
+              color: '#333',
+              outline: 'none',
+              cursor: 'pointer',
+              width: '150px',
+            }}
+          >
+            <option value="ST10" style={{ backgroundColor: '#f5f5f5', color: '#333' }}>ST10</option>
+            <option value="ST11" style={{ backgroundColor: '#f5f5f5', color: '#333' }}>ST11</option>
+          </select>
+          <div style={{ marginLeft: '20px' }}></div>
           <button
             className={`fa fa-fw fa-retweet ${isButtonClicked ? 'clicked' : ''}`}
             style={{
@@ -97,15 +123,12 @@ const Dashboard2 = () => {
         <div style={{ marginLeft: '20px' }}></div>
       </div>
 
-      {/* PieChart */}
       <ResponsiveContainer width="60%" height={130}>
-          <PieChartComponent />
-        </ResponsiveContainer>
+        <PieChartComponent />
+      </ResponsiveContainer>
 
-        {/* Ajout d'espace entre les graphiques */}
-        <div style={{ height: '175px' }}></div>
+      <div style={{ height: '175px' }}></div>
 
-      {/* Boutons en bas de la page */}
       <div
         style={{
           position: 'fixed',
@@ -117,18 +140,16 @@ const Dashboard2 = () => {
           textAlign: 'center',
         }}
       >
-        {/* Bouton pour la page 1 */}
         <Button
           label="Dashboard 1"
           className="p-button-info"
           style={{ marginRight: '10px' }}
           onClick={handlePage1Click}
         />
-        {/* Bouton pour le dashboard 2 (actuel) */}
         <Button
           label="Dashboard 2"
           className="p-button-info"
-          disabled={true} // Désactiver le bouton actuel car nous sommes déjà sur le dashboard 2
+          disabled={true}
         />
       </div>
     </div>

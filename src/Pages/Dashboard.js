@@ -19,12 +19,10 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [statesData, setStatesData] = useState([]);
-  const handleDashboard2Click = () => {
-    navigate('/dashboard2');
-  };
   const [products, setProducts] = useState([]);
   const [totalRendezvousWithoutCancelled, setTotalRendezvousWithoutCancelled] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedSTOption, setSelectedSTOption] = useState(null); // Nouvel état pour ST10 et ST11
   const [dropdownOptions, setDropdownOptions] = useState(["aujourd'hui","semaine","mois"]);
   const [isButtonClicked, setIsButtonClicked] = useState(false);
   const [globalFilter, setGlobalFilter] = useState(null);
@@ -41,9 +39,9 @@ const Dashboard = () => {
       { stateName: 'RETARD', quantity: 0 },
       { stateName: 'NOSHOW', quantity: 0 }
     ];
-  
+
     setStatesData(defaultStates);
-  
+
     const fetchData = async () => {
       try {
         let apiUrl;
@@ -62,9 +60,9 @@ const Dashboard = () => {
         }
         const response = await httpClient.get(apiUrl);
         const data = response.data;
-  
+
         const stateQuantities = {};
-  
+
         const totalRendezvousWithoutCancelledV = data.reduce((acc, item) => {
           if (item.rendezVousEtat.etat !== 'ANNULE') {
             const stateName = item.rendezVousEtat.etat;
@@ -77,13 +75,13 @@ const Dashboard = () => {
           return acc;
         }, 0);
         setTotalRendezvousWithoutCancelled(totalRendezvousWithoutCancelledV);
-  
+
         const updatedStatesData = defaultStates.map(state => ({
           ...state,
           quantity: stateQuantities[state.stateName] || state.quantity
         }));
         setStatesData(updatedStatesData);
-  
+
         const productsData = data.map(item => ({
           idRendezvous: item.bookingDetails.id,
           client: item.bookingDetails.client,
@@ -95,12 +93,12 @@ const Dashboard = () => {
           state: item.rendezVousEtat.etat
         }));
         setProducts(productsData);
-  
+
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-  
+
     fetchData();
   }, [selectedOption]);
 
@@ -116,6 +114,19 @@ const Dashboard = () => {
       localStorage.setItem('selectedOption', selectedOption);
     }
   }, [selectedOption]);
+
+  useEffect(() => {
+    const savedSelectedSTOption = localStorage.getItem('selectedSTOption');
+    if (savedSelectedSTOption) {
+      setSelectedSTOption(savedSelectedSTOption);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (selectedSTOption) {
+      localStorage.setItem('selectedSTOption', selectedSTOption);
+    }
+  }, [selectedSTOption]); // Sauvegarde la valeur dans le localStorage
 
   const formattedLastUpdate = () => {
     const now = new Date();
@@ -198,6 +209,16 @@ const Dashboard = () => {
     }
   };
 
+  // Gestion du changement pour le nouveau select ST10/ST11
+  const handleSTOptionChange = (e) => {
+    if (e.target && e.target.value) {
+      setSelectedSTOption(e.target.value);
+    }
+  };
+  const handleDashboard2Click = () => {
+    navigate('/dashboard2');
+  };
+
   return (
     <div style={{ userSelect: 'none', marginLeft: '75px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -227,6 +248,26 @@ const Dashboard = () => {
                 {option}
               </option>
             ))}
+          </select>
+          <div style={{ marginLeft: '20px' }}></div>
+          <select
+            className="form-select"
+            value={selectedSTOption}
+            onChange={handleSTOptionChange}
+            style={{
+              borderRadius: '20px',
+              padding: '8px 16px',
+              fontSize: '16px',
+              border: '2px solid #007BFF',
+              backgroundColor: 'white',
+              color: '#333',
+              outline: 'none',
+              cursor: 'pointer',
+              width: '150px',
+            }}
+          >
+            <option value="ST10" style={{ backgroundColor: '#f5f5f5', color: '#333' }}>ST10</option>
+            <option value="ST11" style={{ backgroundColor: '#f5f5f5', color: '#333' }}>ST11</option>
           </select>
           <div style={{ marginLeft: '20px' }}></div>
           <button
@@ -347,4 +388,5 @@ const Dashboard = () => {
     </div>
   );
 };
+
 export default Dashboard;
