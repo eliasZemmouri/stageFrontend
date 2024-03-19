@@ -52,10 +52,23 @@ const Example = () => {
             stateQuantities[stateName]++;
             if (item.rendezVousEtat.etat === 'RETARD') {
               // Calculate retards
-              const delay = item.rendezVousEtat.delay;
-              if (delay <= 15) {
+              const delay = item.rendezVousEtat.tempsModification;
+              const date = new Date(delay);
+              const heures = date.getHours();
+              const minutes = date.getMinutes();
+              const heureMinutes = heures * 60 + minutes;
+
+              // Convertir item.bookingDetails.heure en minutes
+              const heuresBooking = parseInt(item.bookingDetails.heure.split(':')[0]);
+              const minutesBooking = parseInt(item.bookingDetails.heure.split(':')[1]);
+              const heureMinutesBooking = heuresBooking * 60 + minutesBooking;
+
+              // Calculer la différence en minutes
+              const differenceEnMinutes = heureMinutes - heureMinutesBooking;
+              console.log(differenceEnMinutes); // Affiche la différence en minutes
+              if (differenceEnMinutes <= 15) {
                 retards['<15']++;
-              } else if (delay <= 30) {
+              } else if (differenceEnMinutes <= 30) {
                 retards['<30']++;
               } else {
                 retards['>30']++;
@@ -81,6 +94,11 @@ const Example = () => {
         }));
 
         setData(updatedData);
+        setRetardData([
+          { name: '<15', value: retards['<15'] },
+          { name: '<30', value: retards['<30'] },
+          { name: '>30', value: retards['>30'] }
+        ]);
         setLoading(false); // Set loading to false after fetching data
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -205,7 +223,7 @@ const Example = () => {
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
                   <Pie
-                    data={retards}
+                    data={retardData}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
@@ -214,7 +232,7 @@ const Example = () => {
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {retards.map((entry, index) => (
+                    {retardData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
