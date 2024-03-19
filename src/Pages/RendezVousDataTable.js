@@ -17,8 +17,14 @@ const RendezVousDataTable = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await httpClient.get('http://192.168.110.106:9005/api/bookings/details');
-        const bookingDetailsArray = response.data.map((item) => item.bookingDetails);
+        const response = await httpClient.get('/api/bookings/details/TODAY');
+        const bookingDetailsArray = response.data.map((item) => {
+          const { bookingDetails, rendezVousEtat } = item;
+          return {
+            ...bookingDetails,
+            etat: rendezVousEtat.etat // Ajoutez la propriété etat
+          };
+        });
         setData(bookingDetailsArray);
       } catch (error) {
         console.error('Error fetching data:', error.message);
@@ -40,11 +46,6 @@ const RendezVousDataTable = () => {
     { label: 'Refusé', value: 'Refusé' },
     // Ajoutez d'autres états selon vos besoins
   ];
-  const formattedLastUpdate = () => {
-    const now = new Date();
-    const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-    return now.toLocaleDateString('fr-FR', options);
-  };
 
   const handleGlobalFilterChange = (e) => {
     setGlobalFilter(e.target.value);
@@ -59,7 +60,7 @@ const RendezVousDataTable = () => {
       key={state.value}
       className={`btn ${selectedState === state.value ? 'btn-info' : 'btn-secondary'}`}
       onClick={() => handleStateChange(state.value)}
-      style={{ marginRight: '30px' }}
+      style={{ marginRight: '10px' }} // Ajout de l'espace entre les boutons
     >
       {state.label}
     </button>
@@ -70,6 +71,7 @@ const RendezVousDataTable = () => {
   const globalFilterElement = (
     <div className="table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <div style={{ marginLeft: '25px', display: 'flex' }}>{stateButtons}</div>
+      <input type="text" placeholder="Global Search" value={globalFilter} onChange={handleGlobalFilterChange} />
     </div>
   );
 
@@ -78,7 +80,7 @@ const RendezVousDataTable = () => {
       <button className="btn btn-success" onClick={() => handleAccept(rowData)}>
         Valider
       </button>
-      <span style={{ margin: '10px' }}></span>
+      <span style={{ margin: '0 10px' }}></span> {/* Ajout de l'espace entre les boutons */}
       <button className="btn btn-danger" onClick={() => handleReject(rowData)}>
         Refuser
       </button>
@@ -104,8 +106,13 @@ const RendezVousDataTable = () => {
       if (result.isConfirmed) {
         const ligne = result.value;
         Swal.fire({
-          html: `Vous avez sélectionné la Ligne: ${ligne}`
+          position: "center",
+          icon: "success",
+          title: `${ligne}`,
+          showConfirmButton: false,
+          timer: 1000
         });
+        
       }
     });
     console.log('Accept:', rowData);
@@ -113,60 +120,71 @@ const RendezVousDataTable = () => {
 
   const handleReject =async (rowData) => {
     
-    const { value: raison } = await Swal.fire({
-      title: "Selectionne la raison",
-      input: "select",
+    Swal.fire({
+      title: 'Accepter la réservation',
+      text: 'Veuillez sélectionner une Ligne:',
+      input: 'radio',
       inputOptions: {
-        Danger: {
-          agressif: "Agressif",
-          perturbateur: "Perturbateur"
-        },
-        autre: "Autre Raison"
+        'Agressif': 'Agressif',
+        'Retard': 'Retard',
+        'Autre': 'Autre'
       },
-      inputPlaceholder: "Selectionne la raison",
-      showCancelButton: true,
       inputValidator: (value) => {
-        return new Promise((resolve) => {
-          if (!value) {
-            resolve('Vous devez choisir une raison!');
-          } else {
-            resolve();
-          }
-          
-        });
+        if (!value) {
+          return 'Vous devez choisir une Raison!';
+        }
+      }
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const Refus = result.value;
+        try {
+          // Appel de l'API pour refuser le rendez-vous avec l'id et la raison
+          const response = await httpClient.post(`/api/bookings/refuser/${rowData.id}`, {Refus} );
+          console.log('Réponse de l\'API:', response.data);
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: response.data,
+            showConfirmButton: false,
+            timer: 1000
+          });
+
+          // Mettre à jour l'état du rendez-vous refusé dans le tableau de données
+          const updatedData = data.map(item => {
+            if (item.id === rowData.id) {
+              return { ...item, etat: 'REFUSE' };
+            }
+            return item;
+          });
+          setData(updatedData);
+        } catch (error) {
+          console.error('Erreur lors de l\'appel de l\'API:', error);
+          // Afficher un message d'erreur ou effectuer d'autres actions en cas d'erreur
+          Swal.fire('Erreur', 'Une erreur s\'est produite lors du refus du rendez-vous.', 'error');
+        }
+        
       }
     });
-    if (raison) {
-      try {
-        // Appel de l'API pour refuser le rendez-vous avec l'id et la raison
-        const response = await httpClient.post(`/api/bookings/refuser/${rowData.id}`, { raison });
-        console.log('Réponse de l\'API:', response.data);
-
-        // Afficher un message ou effectuer d'autres actions en fonction de la réponse de l'API
-        Swal.fire('Succès', 'Rendez-vous refusé avec succès.', 'success');
-      } catch (error) {
-        console.error('Erreur lors de l\'appel de l\'API:', error);
-        // Afficher un message d'erreur ou effectuer d'autres actions en cas d'erreur
-        Swal.fire('Erreur', 'Une erreur s\'est produite lors du refus du rendez-vous.', 'error');
-      }
-    }
+   
+    
     console.log('Reject:', rowData);
 
   };
+
+  const formattedLastUpdate = () => {
+    const now = new Date();
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+    return now.toLocaleDateString('fr-FR', options);
+  };
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginLeft: '75px' }}>
-        {/* Image à gauche */}
         <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px' }} />
-
-        {/* Conteneur à droite */}
         <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-          {/* Centrer l'élément <p> */}
           <div style={{ textAlign: 'center', flex: 1 }}>
             <p style={{ whiteSpace: 'nowrap', marginTop: '10px', marginLeft: 'auto', marginRight: 'auto' }}>Dernière Maj : {formattedLastUpdate()}</p>
           </div>
-
-          {/* Bouton Plus */}
           <button
             className="fa fa-fw fa-plus"
             style={{
@@ -180,11 +198,7 @@ const RendezVousDataTable = () => {
             }}
             onClick={handleRefreshClick}
           />
-
-          {/* Espace entre les boutons */}
           <div style={{ marginLeft: '20px' }}></div>
-
-          {/* Bouton Retweet */}
           <button
             className="fa fa-fw fa-retweet"
             style={{
@@ -201,14 +215,16 @@ const RendezVousDataTable = () => {
           <div style={{ marginLeft: '20px' }}></div>
         </div>
       </div>
-
-
-
-
       <div className="container-fluid mt-4 main-container">
         <div className="custom-table-container">
           <DataTable
-            value={data}
+            value={data.filter(row => {
+              if (selectedState === 'Refusé') {
+                return row.etat === 'REFUSE';
+              } else {
+                return row.etat === selectedState.toUpperCase();
+              }
+            })}
             stripedRows
             className="p-datatable-striped"
             scrollable
