@@ -17,7 +17,7 @@ const RendezVousDataTable = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await httpClient.get('/api/bookings/details/TODAY');
+        const response = await httpClient.get('/api/bookings/details/TODAY/ST10');
         const bookingDetailsArray = response.data.map((item) => {
           const { bookingDetails, rendezVousEtat } = item;
           return {

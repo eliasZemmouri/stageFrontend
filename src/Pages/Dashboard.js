@@ -6,7 +6,7 @@ import PieChartComponent from '../Components/DashboardComponents/PieChart';
 import StateBlock from '../Components/DashboardComponents/StateBlock';
 import './Dashboard.css';
 import monImage from '../images/s-a.png';
-import { httpClient } from '../Api/HttpClient'
+import { httpClient } from '../Api/HttpClient';
 import BarChart from '../Components/DashboardComponents/BarChart';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -21,9 +21,9 @@ const Dashboard = () => {
   const [statesData, setStatesData] = useState([]);
   const [products, setProducts] = useState([]);
   const [totalRendezvousWithoutCancelled, setTotalRendezvousWithoutCancelled] = useState(0);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [selectedSTOption, setSelectedSTOption] = useState(null); // Nouvel état pour ST10 et ST11
-  const [dropdownOptions, setDropdownOptions] = useState(["aujourd'hui","semaine","mois"]);
+  const [selectedOption, setSelectedOption] = useState(localStorage.getItem('selectedOption') || 'aujourd\'hui');
+  const [selectedSTOption, setSelectedSTOption] = useState(localStorage.getItem('selectedSTOption') || 'ST10');
+  const [dropdownOptions, setDropdownOptions] = useState(["aujourd'hui", "semaine", "mois"]);
   const [isButtonClicked, setIsButtonClicked] = useState(false);
   const [globalFilter, setGlobalFilter] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -44,25 +44,25 @@ const Dashboard = () => {
 
     const fetchData = async () => {
       try {
+        setLoading(true);
         let apiUrl;
-        switch(selectedOption) {
+        switch (selectedOption) {
           case "aujourd'hui":
-            apiUrl = '/api/bookings/details/TODAY';
+            apiUrl = `/api/bookings/details/TODAY/${selectedSTOption}`;
             break;
           case "semaine":
-            apiUrl = '/api/bookings/details/THIS_WEEK';
+            apiUrl = `/api/bookings/details/THIS_WEEK/${selectedSTOption}`;
             break;
           case "mois":
-            apiUrl = '/api/bookings/details/THIS_MONTH';
+            apiUrl = `/api/bookings/details/THIS_MONTH/${selectedSTOption}`;
             break;
           default:
-            apiUrl = '/api/bookings/details/TODAY';
+            apiUrl =  `/api/bookings/details/TODAY/${selectedSTOption}`;
         }
         const response = await httpClient.get(apiUrl);
         const data = response.data;
 
         const stateQuantities = {};
-
         const totalRendezvousWithoutCancelledV = data.reduce((acc, item) => {
           if (item.rendezVousEtat.etat !== 'ANNULE') {
             const stateName = item.rendezVousEtat.etat;
@@ -94,8 +94,10 @@ const Dashboard = () => {
         }));
         setProducts(productsData);
 
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
+        setLoading(false);
       }
     };
 
@@ -103,30 +105,12 @@ const Dashboard = () => {
   }, [selectedOption]);
 
   useEffect(() => {
-    const savedSelectedOption = localStorage.getItem('selectedOption');
-    if (savedSelectedOption) {
-      setSelectedOption(savedSelectedOption);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (selectedOption) {
-      localStorage.setItem('selectedOption', selectedOption);
-    }
+    localStorage.setItem('selectedOption', selectedOption);
   }, [selectedOption]);
 
   useEffect(() => {
-    const savedSelectedSTOption = localStorage.getItem('selectedSTOption');
-    if (savedSelectedSTOption) {
-      setSelectedSTOption(savedSelectedSTOption);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (selectedSTOption) {
-      localStorage.setItem('selectedSTOption', selectedSTOption);
-    }
-  }, [selectedSTOption]); // Sauvegarde la valeur dans le localStorage
+    localStorage.setItem('selectedSTOption', selectedSTOption);
+  }, [selectedSTOption]);
 
   const formattedLastUpdate = () => {
     const now = new Date();
@@ -170,14 +154,11 @@ const Dashboard = () => {
     if (e.target && e.target.value) {
       setSelectedOption(e.target.value);
       setSelectedState(e.target.value);
-
-      window.location.reload();
     }
   };
 
   const handleRefreshClick = () => {
     setIsButtonClicked(!isButtonClicked);
-    window.location.reload();
   };
 
   const handleStateClick = (stateName) => {
@@ -215,6 +196,7 @@ const Dashboard = () => {
       setSelectedSTOption(e.target.value);
     }
   };
+
   const handleDashboard2Click = () => {
     navigate('/dashboard2');
   };
@@ -390,3 +372,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
