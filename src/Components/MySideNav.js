@@ -15,6 +15,8 @@ function MySideNav(){
         onSelect={(selected)=>{
             console.log(selected);
             if (selected === 'logout') {
+                //retirer selection lors de la deconexion
+                localStorage.removeItem('selectedST');
                 // Si l'élément sélectionné est "logout", effectuer la déconnexion
                 handleLogout();
               } else {

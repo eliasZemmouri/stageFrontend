@@ -13,11 +13,13 @@ const RendezVousDataTable = () => {
   const [data, setData] = useState([]);
   const [selectedState, setSelectedState] = useState('Avenir');
   const [globalFilter, setGlobalFilter] = useState('');
+  const [selectedST, setSelectedST] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await httpClient.get('/api/bookings/details/TODAY/ST10');
+        if (!selectedST) return;
+        const response = await httpClient.get(`/api/bookings/details/TODAY/${selectedST}`);
         const bookingDetailsArray = response.data.map((item) => {
           const { bookingDetails, rendezVousEtat } = item;
           return {
@@ -32,6 +34,18 @@ const RendezVousDataTable = () => {
     };
 
     fetchData();
+  }, [selectedST]);
+
+  const handleSTSelect = (st) => {
+    setSelectedST(st);
+    localStorage.setItem('selectedST', st);
+  };
+
+  useEffect(() => {
+    const selectedSTFromStorage = localStorage.getItem('selectedST');
+    if (selectedSTFromStorage) {
+      setSelectedST(selectedSTFromStorage);
+    }
   }, []);
 
   const handleStateChange = (state) => {
@@ -54,6 +68,50 @@ const RendezVousDataTable = () => {
   const handleRefreshClick = () => {
     window.location.reload();
   };
+  const handleAddClick = () => {
+    Swal.fire({
+        title: 'Ajouter un rendez-vous',
+        html:
+            '<input id="plaque" class="swal2-input" placeholder="Plaque">' +
+            '<select id="choix" class="swal2-select">' +
+            '<option value="parking">Parking</option>' +
+            '<option value="personnel">Personnel</option>' +
+            '</select>',
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Ajouter',
+        preConfirm: () => {
+            const plaque = document.getElementById('plaque').value;
+            const choix = document.getElementById('choix').value;
+            if (!plaque || !choix) {
+                Swal.showValidationMessage('Veuillez remplir tous les champs.');
+                return false;
+            }
+            return [plaque, choix];
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const [plaque, choix] = result.value;
+            // Simulation de l'ajout de rendez-vous
+            setTimeout(() => {
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Rendez-vous ajouté avec succès!',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    didClose: () => {
+                        // Ajoutez ici la logique pour traiter les valeurs entrées après l'animation
+                        console.log('Plaque:', plaque);
+                        console.log('Choix:', choix);
+                    }
+                });
+            }, 500); // Délai avant l'affichage de l'animation
+        }
+    });
+  };
+
+
 
   const renderStateButton = (state) => (
     <button
@@ -179,72 +237,89 @@ const RendezVousDataTable = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginLeft: '75px' }}>
-        <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px' }} />
-        <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-          <div style={{ textAlign: 'center', flex: 1 }}>
-            <p style={{ whiteSpace: 'nowrap', marginTop: '10px', marginLeft: 'auto', marginRight: 'auto' }}>Dernière Maj : {formattedLastUpdate()}</p>
+      {!selectedST && (
+        <div style={{ textAlign: 'center', marginTop: '20px' }}>
+          <h3>Choisissez une option :</h3>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+            <button className="btn btn-primary" style={{ marginRight: '10px', width: '150px', fontSize: '1.2em' }} onClick={() => handleSTSelect('ST10')}>
+              ST10
+            </button>
+            <button className="btn btn-primary" style={{ width: '150px', fontSize: '1.2em' }} onClick={() => handleSTSelect('ST11')}>
+              ST11
+            </button>
           </div>
-          <button
-            className="fa fa-fw fa-plus"
-            style={{
-              fontSize: '2em',
-              backgroundColor: '#007BFF',
-              color: 'white',
-              padding: '4px',
-              borderRadius: '20px',
-              border: 'none',
-              marginLeft: '10px',
-            }}
-            onClick={handleRefreshClick}
-          />
-          <div style={{ marginLeft: '20px' }}></div>
-          <button
-            className="fa fa-fw fa-retweet"
-            style={{
-              fontSize: '2em',
-              backgroundColor: '#007BFF',
-              color: 'white',
-              padding: '4px',
-              borderRadius: '20px',
-              border: 'none',
-              marginLeft: '10px',
-            }}
-            onClick={handleRefreshClick}
-          />
-          <div style={{ marginLeft: '20px' }}></div>
         </div>
-      </div>
-      <div className="container-fluid mt-4 main-container">
-        <div className="custom-table-container">
-          <DataTable
-            value={data.filter(row => {
-              if (selectedState === 'Refusé') {
-                return row.etat === 'REFUSE';
-              } else {
-                return row.etat === selectedState.toUpperCase();
-              }
-            })}
-            stripedRows
-            className="p-datatable-striped"
-            scrollable
-            scrollHeight="calc(100vh - 120px)"
-            globalFilter={globalFilter}
-            header={globalFilterElement}
-            emptyMessage="Aucun rendez-vous trouvé."
-          >
-            <Column field="heure" header="Heure" style={{ width: '5%' }} />
-            <Column field="id" header="Reservation" style={{ width: '10%' }} />
-            <Column field="plaque" header="Plaque" style={{ width: '8%' }} />
-            <Column field="chassis" header="Chassis" style={{ width: '14%' }} />
-            <Column field="source" header="Source" style={{ width: '6%' }} />
-            <Column field="client" header="Client" style={{ width: '15%' }} />
-            <Column field="typeDeVisite" header="Type de Visite" style={{ width: '12%' }} />
-            <Column field="vehicule" header="Véhicule" style={{ width: '15%' }} />
-            <Column body={actionButtons} header="Actions" style={{ width: '23%' }} />
-          </DataTable>
+      )}
+      {selectedST && (
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginLeft: '75px' }}>
+            <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px' }} />
+            <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+              <div style={{ textAlign: 'center', flex: 1 }}>
+                <p style={{ whiteSpace: 'nowrap', marginTop: '10px', marginLeft: 'auto', marginRight: 'auto' }}>Dernière Maj : {formattedLastUpdate()}</p>
+              </div>
+              <button
+                className="fa fa-fw fa-plus"
+                style={{
+                  fontSize: '2em',
+                  backgroundColor: '#007BFF',
+                  color: 'white',
+                  padding: '4px',
+                  borderRadius: '20px',
+                  border: 'none',
+                  marginLeft: '10px',
+                }}
+                onClick={handleAddClick}
+              />
+              <div style={{ marginLeft: '20px' }}></div>
+              <button
+                className="fa fa-fw fa-retweet"
+                style={{
+                  fontSize: '2em',
+                  backgroundColor: '#007BFF',
+                  color: 'white',
+                  padding: '4px',
+                  borderRadius: '20px',
+                  border: 'none',
+                  marginLeft: '10px',
+                }}
+                onClick={handleRefreshClick}
+              />
+              <div style={{ marginLeft: '20px' }}></div>
+            </div>
+          </div>
+          <div className="container-fluid mt-4 main-container">
+            <div className="custom-table-container">
+              <DataTable
+                value={data.filter(row => {
+                  if (selectedState === 'Refusé') {
+                    return row.etat === 'REFUSE';
+                  } else {
+                    return row.etat === selectedState.toUpperCase();
+                  }
+                })}
+                stripedRows
+                className="p-datatable-striped"
+                scrollable
+                scrollHeight="calc(100vh - 120px)"
+                globalFilter={globalFilter}
+                header={globalFilterElement}
+                emptyMessage="Aucun rendez-vous trouvé."
+              >
+                <Column field="heure" header="Heure" style={{ width: '5%' }} />
+                <Column field="id" header="Reservation" style={{ width: '10%' }} />
+                <Column field="plaque" header="Plaque" style={{ width: '8%' }} />
+                <Column field="chassis" header="Chassis" style={{ width: '14%' }} />
+                <Column field="source" header="Source" style={{ width: '6%' }} />
+                <Column field="client" header="Client" style={{ width: '15%' }} />
+                <Column field="typeDeVisite" header="Type de Visite" style={{ width: '12%' }} />
+                <Column field="vehicule" header="Véhicule" style={{ width: '15%' }} />
+                <Column body={actionButtons} header="Actions" style={{ width: '23%' }} />
+              </DataTable>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
