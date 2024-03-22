@@ -5,8 +5,8 @@ import { httpClient } from '../../Api/HttpClient';
 const Example = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedOption, setSelectedOption] = useState("aujourd'hui");
-  const [selectedStation, setSelectedStation] = useState("default"); // Ajout de l'état de la station sélectionnée
+  const [selectedOption, setSelectedOption] = useState(localStorage.getItem('selectedOption') || 'aujourd\'hui');
+  const [selectedStation, setSelectedStation] = useState(localStorage.getItem('selectedSTOption') || 'ST10'); // Ajout de l'état de la station sélectionnée
   const [retardData, setRetardData] = useState([]);
   const [attenteData, setAttenteData] = useState([]);
 
@@ -26,16 +26,16 @@ const Example = () => {
         let apiUrl;
         switch(selectedOption) {
           case "aujourd'hui":
-            apiUrl = `/api/bookings/details/TODAY/${selectedStation || 'ST10'}`; // Utiliser la station sélectionnée dans l'URL de l'API
+            apiUrl = `/api/bookings/details/TODAY/${selectedStation}`; // Utiliser la station sélectionnée dans l'URL de l'API
             break;
           case "semaine":
-            apiUrl = `/api/bookings/details/THIS_WEEK/${selectedStation || 'ST10'}`;
+            apiUrl = `/api/bookings/details/THIS_WEEK/${selectedStation}`;
             break;
           case "mois":
-            apiUrl = `/api/bookings/details/THIS_MONTH/${selectedStation || 'ST10'}`;
+            apiUrl = `/api/bookings/details/THIS_MONTH/${selectedStation}`;
             break;
           default:
-            apiUrl = `/api/bookings/details/TODAY/${selectedStation || 'ST10'}`;
+            apiUrl = `/api/bookings/details/TODAY/${selectedStation}`;
         }
         const response = await httpClient.get(apiUrl);
         const fetchedData = response.data;

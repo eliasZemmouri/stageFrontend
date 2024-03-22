@@ -294,20 +294,22 @@ const RendezVousDataTable = () => {
                 value={data.filter(row => {
                   if (selectedState === 'Refusé') {
                     return row.etat === 'REFUSE';
-                  } else {
+                  }else if(selectedState === 'Validé'){
+                    return row.etat === 'ACCEPTE';
+                  }else {
                     return row.etat === selectedState.toUpperCase();
                   }
                 })}
                 stripedRows
                 className="p-datatable-striped"
                 scrollable
-                scrollHeight="calc(100vh - 120px)"
+                scrollHeight="calc(80vh - 120px)"
                 globalFilter={globalFilter}
                 header={globalFilterElement}
                 emptyMessage="Aucun rendez-vous trouvé."
               >
                 <Column field="heure" header="Heure" style={{ width: '5%' }} />
-                <Column field="id" header="Reservation" style={{ width: '10%' }} />
+                <Column field="id" header="RDV" style={{ width: '7%' }} />
                 <Column field="plaque" header="Plaque" style={{ width: '8%' }} />
                 <Column field="chassis" header="Chassis" style={{ width: '14%' }} />
                 <Column field="source" header="Source" style={{ width: '6%' }} />

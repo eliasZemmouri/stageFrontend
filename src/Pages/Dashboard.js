@@ -31,6 +31,10 @@ const Dashboard = () => {
   const [dialogVisible, setDialogVisible] = useState(false);
   const [selectedState, setSelectedState] = useState(null);
 
+  //juste en attendant une solution j'affiche PieChart apres le get
+  //const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+
   useEffect(() => {
     const defaultStates = [
       { stateName: 'AVENIR', quantity: 0 },
@@ -61,7 +65,7 @@ const Dashboard = () => {
         }
         const response = await httpClient.get(apiUrl);
         const data = response.data;
-
+        //setIsDataLoaded(true);
         const stateQuantities = {};
         const totalRendezvousWithoutCancelledV = data.reduce((acc, item) => {
           if (item.rendezVousEtat.etat !== 'ANNULE') {
@@ -159,6 +163,7 @@ const Dashboard = () => {
 
   const handleRefreshClick = () => {
     setIsButtonClicked(!isButtonClicked);
+    window.location.reload();
   };
 
   const handleStateClick = (stateName) => {
