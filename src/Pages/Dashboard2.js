@@ -4,6 +4,8 @@ import { Button } from 'primereact/button';
 import monImage from '../images/s-a.png';
 import { ResponsiveContainer } from 'recharts';
 import PieChartComponent from '../Components/DashboardComponents/PieChart2';
+import LineChartComponent from '../Components/DashboardComponents/LineChart';
+
 
 const Dashboard2 = () => {
   const navigate = useNavigate();
@@ -123,9 +125,17 @@ const Dashboard2 = () => {
         <div style={{ marginLeft: '20px' }}></div>
       </div>
 
-      <ResponsiveContainer width="60%" height={130}>
+      <ResponsiveContainer width="100%" height={130}>
         <PieChartComponent />
       </ResponsiveContainer>
+      <div style={{ height: '175px' }}></div>
+      <ResponsiveContainer width="80%" height={250} style={{ borderRadius: 20, backgroundColor: 'white' }}>
+            <div style={{ margin: 'auto', textAlign: 'center' }}>
+              <div style={{ height: '15px' }}></div>
+              <h6>Nombre Visites par type d'attentes</h6>
+            </div>
+            <LineChartComponent />
+          </ResponsiveContainer>
 
       <div style={{ height: '175px' }}></div>
 

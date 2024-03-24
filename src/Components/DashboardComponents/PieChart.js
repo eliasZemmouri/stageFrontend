@@ -244,48 +244,6 @@ const Example = () => {
         )}
       </div>
 
-      {/* Paire 3 */}
-      <div style={{ ...boxStyle, flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', backgroundColor: 'white' }}>
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
-          <>
-            {/* Tableau 3 */}
-            <div style={{ flex: 1, marginRight: '10px' }}>
-              <h5>Temps d'attente (min)</h5>
-              <div>
-                {fileAttente.map((item, index) => (
-                  <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
-                    <div style={{ width: '20px', height: '20px', backgroundColor: COLORS[index], marginRight: '5px', borderRadius: '50%' }}></div>
-                    <div>{item.name}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            {/* Chart 3 */}
-            <div style={{ flex: 1 }}>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie
-                    data={fileAttente}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={renderCustomizedLabel}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {fileAttente.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </>
-        )}
-      </div>
     </div>
   );
 };

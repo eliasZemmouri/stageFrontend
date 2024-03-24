@@ -72,10 +72,12 @@ const RendezVousDataTable = () => {
     Swal.fire({
         title: 'Ajouter un rendez-vous',
         html:
-            '<input id="plaque" class="swal2-input" placeholder="Plaque">' +
+            '<input id="plaque" class="swal2-input" style="margin-bottom: 30px;" placeholder="Plaque">' +
+            '<div style="margin-bottom: 20px;"><input type="radio" id="accordChef" name="accordType" value="accordChef" style="transform: scale(1.5);"><label for="accordChef" style="margin-left: 5px;">Accord Chef</label><input type="radio" id="euemST" name="accordType" value="euemST" style="transform: scale(1.5); margin-left: 20px;"><label for="euemST" style="margin-left: 5px;">EuemST</label></div>' +
             '<select id="choix" class="swal2-select">' +
-            '<option value="parking">Parking</option>' +
-            '<option value="personnel">Personnel</option>' +
+            '<option value="periodique">Periodique</option>' +
+            '<option value="occasion">Occasion</option>' +
+            '<option value="revisite">Revisite</option>' +
             '</select>',
         focusConfirm: false,
         showCancelButton: true,
@@ -83,15 +85,17 @@ const RendezVousDataTable = () => {
         preConfirm: () => {
             const plaque = document.getElementById('plaque').value;
             const choix = document.getElementById('choix').value;
-            if (!plaque || !choix) {
+            const accordTypeElement = document.querySelector('input[name="accordType"]:checked');
+            const accordType = accordTypeElement ? accordTypeElement.value : null;
+            if (!plaque || !choix || !accordType) {
                 Swal.showValidationMessage('Veuillez remplir tous les champs.');
                 return false;
             }
-            return [plaque, choix];
+            return { plaque, choix, accordType };
         }
     }).then((result) => {
         if (result.isConfirmed) {
-            const [plaque, choix] = result.value;
+            const { plaque, choix, accordType } = result.value;
             // Simulation de l'ajout de rendez-vous
             setTimeout(() => {
                 Swal.fire({
@@ -104,12 +108,14 @@ const RendezVousDataTable = () => {
                         // Ajoutez ici la logique pour traiter les valeurs entrées après l'animation
                         console.log('Plaque:', plaque);
                         console.log('Choix:', choix);
+                        console.log('Accord Type:', accordType);
                     }
                 });
             }, 500); // Délai avant l'affichage de l'animation
         }
     });
-  };
+};
+
 
 
 
