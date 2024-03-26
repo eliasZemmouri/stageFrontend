@@ -189,8 +189,8 @@ const RendezVousDataTable = () => {
       text: 'Veuillez sélectionner une Ligne:',
       input: 'radio',
       inputOptions: {
-        'Agressif': 'Agressif',
-        'Retard': 'Retard',
+        'Trop tot': 'Trop Tot',
+        'Comportement': 'Comportement',
         'Autre': 'Autre'
       },
       inputValidator: (value) => {

@@ -40,7 +40,7 @@ const Dashboard = () => {
       { stateName: 'AVENIR', quantity: 0 },
       { stateName: 'ACCEPTE', quantity: 0 },
       { stateName: 'REFUSE', quantity: 0 },
-      { stateName: 'RETARD', quantity: 0 },
+      { stateName: 'SANS_RENDEZVOUS', quantity: 0 },
       { stateName: 'NOSHOW', quantity: 0 }
     ];
 
