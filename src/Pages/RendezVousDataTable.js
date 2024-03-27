@@ -54,7 +54,7 @@ const RendezVousDataTable = () => {
 
   const stateOptions = [
     { label: 'A venir', value: 'A venir' },
-    { label: 'Tot', value: 'Tot' },
+    { label: 'Avance', value: 'Avance' },
     { label: 'Retard', value: 'Retard' },
     { label: 'Validé', value: 'Validé' },
     { label: 'Refusé', value: 'Refusé' },
