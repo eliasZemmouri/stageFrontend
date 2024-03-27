@@ -46,7 +46,7 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 class Example extends PureComponent {
   render() {
     const borderRadius = '20px';
-    const marginBetweenPairs = '3%';
+    const marginBetweenPairs = '3.5%';
     const BoxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
 
     const boxStyle = {
@@ -56,45 +56,8 @@ class Example extends PureComponent {
 
     return (
       <div style={{ display: 'flex', margin: '10px' }}>
-        {/* Paire 1 */}
-        <div style={{ ...boxStyle, flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', marginRight: marginBetweenPairs, backgroundColor: 'white' }}>
-          {/* Tableau 1 */}
-          <div style={{ flex: 1, marginRight: '10px' }}>
-            <h5>Temps d'ispection (min)</h5>
-            <div>
-              {retards.map((item, index) => (
-                <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
-                  <div style={{ width: '20px', height: '20px', backgroundColor: COLORS[index], marginRight: '5px', borderRadius: '50%' }}></div>
-                  <div>{item.name}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* Chart 1 */}
-          <div style={{ flex: 1 }}>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={retards}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderCustomizedLabel}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {retards.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
         {/* Paire 2 */}
-        <div style={{ ...boxStyle, flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', backgroundColor: 'white' }}>
+        <div style={{ ...boxStyle, flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', marginRight: marginBetweenPairs, backgroundColor: 'white' }}>
           {/* Tableau 2 */}
           <div style={{ flex: 1, marginRight: '10px' }}>
             <h5>Temps de visite (min)</h5>
@@ -131,7 +94,7 @@ class Example extends PureComponent {
         </div>
           
           {/* Paire 3 */}
-        <div style={{ ...boxStyle, flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', backgroundColor: 'white' }}>
+        <div style={{ ...boxStyle, flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', marginRight: marginBetweenPairs, backgroundColor: 'white' }}>
           
             
               {/* Tableau 3 */}

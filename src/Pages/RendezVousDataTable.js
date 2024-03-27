@@ -53,7 +53,7 @@ const RendezVousDataTable = () => {
   };
 
   const stateOptions = [
-    { label: 'Avenir', value: 'Avenir' },
+    { label: 'A venir', value: 'A venir' },
     { label: 'Tot', value: 'Tot' },
     { label: 'Retard', value: 'Retard' },
     { label: 'Validé', value: 'Validé' },
@@ -73,7 +73,7 @@ const RendezVousDataTable = () => {
         title: 'Ajouter un rendez-vous',
         html:
             '<input id="plaque" class="swal2-input" style="margin-bottom: 30px;" placeholder="Plaque">' +
-            '<div style="margin-bottom: 20px;"><input type="radio" id="accordChef" name="accordType" value="accordChef" style="transform: scale(1.5);"><label for="accordChef" style="margin-left: 5px;">Accord Chef</label><input type="radio" id="euemST" name="accordType" value="euemST" style="transform: scale(1.5); margin-left: 20px;"><label for="euemST" style="margin-left: 5px;">EuemST</label></div>' +
+            '<div style="margin-bottom: 20px;"><input type="radio" id="accordChef" name="accordType" value="accordChef" style="transform: scale(1.5);"><label for="accordChef" style="margin-left: 5px;">Accord Chef</label><input type="radio" id="euemST" name="accordType" value="erreurST" style="transform: scale(1.5); margin-left: 20px;"><label for="erreurST" style="margin-left: 5px;">Erreur ST</label></div>' +
             '<select id="choix" class="swal2-select">' +
             '<option value="periodique">Periodique</option>' +
             '<option value="occasion">Occasion</option>' +
@@ -189,7 +189,9 @@ const RendezVousDataTable = () => {
       text: 'Veuillez sélectionner une Ligne:',
       input: 'radio',
       inputOptions: {
-        'Trop tot': 'Trop Tot',
+        'Trop tot': 'Trop tot',
+        'Trop tard': 'Trop tard',
+        'Mauvais véhicule': 'Mauvais véhicule',
         'Comportement': 'Comportement',
         'Autre': 'Autre'
       },
@@ -320,7 +322,8 @@ const RendezVousDataTable = () => {
                 <Column field="chassis" header="Chassis" style={{ width: '14%' }} />
                 <Column field="source" header="Source" style={{ width: '6%' }} />
                 <Column field="client" header="Client" style={{ width: '15%' }} />
-                <Column field="typeDeVisite" header="Type de Visite" style={{ width: '12%' }} />
+                <Column field="typeDeVisite" header="Type de Visite" style={{ width: '10%' }} />
+                <Column field="Ligne" header="Ligne" style={{ width: '2%' }} />
                 <Column field="vehicule" header="Véhicule" style={{ width: '15%' }} />
                 <Column body={actionButtons} header="Actions" style={{ width: '23%' }} />
               </DataTable>

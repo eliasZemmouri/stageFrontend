@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ResponsiveContainer } from 'recharts';
+import { PieChart, ResponsiveContainer } from 'recharts';
 import LineChartComponent from '../Components/DashboardComponents/LineChart';
 import PieChartComponent from '../Components/DashboardComponents/PieChart';
+import PieChartComponent2 from '../Components/DashboardComponents/PieChart2';
 import StateBlock from '../Components/DashboardComponents/StateBlock';
 import './Dashboard.css';
 import monImage from '../images/s-a.png';
@@ -37,7 +38,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     const defaultStates = [
-      { stateName: 'AVENIR', quantity: 0 },
+      { stateName: 'A VENIR', quantity: 0 },
       { stateName: 'ACCEPTE', quantity: 0 },
       { stateName: 'REFUSE', quantity: 0 },
       { stateName: 'SANS_RENDEZVOUS', quantity: 0 },
@@ -274,9 +275,9 @@ const Dashboard = () => {
         <div style={{ marginLeft: '20px' }}></div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '15px' }}>
         <div>
-          <div style={{border:'1px solid #ccc', display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: '20px', backgroundColor:'white'}}><h4 style={{marginTop: '10px', marginBottom:'10px'}}>Total Rendez-vous : <span style={{ color: '#2BB67D' }}>{totalRendezvousWithoutCancelled}</span></h4></div>
+          <div style={{border:'1px solid #ccc', display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: '20px', backgroundColor:'white'}}><h4 style={{marginTop: '10px', marginBottom:'5px'}}>Total Rendez-vous : <span style={{ color: '#2BB67D' }}>{totalRendezvousWithoutCancelled}</span> pour une limite de : <span style={{ color: '#2BB67D' }}>x</span> visites</h4></div>
           <div className="state-container">
             {statesData.map((stateInfo, index) => (
               <StateBlock
@@ -291,9 +292,9 @@ const Dashboard = () => {
         <ResponsiveContainer width="80%" height={130}>
           <PieChartComponent />
         </ResponsiveContainer>
-        <div style={{ height: '175px' }}></div>
+        <div style={{ height: '150px' }}></div>
         <div style={{ display: 'flex', width: '80%' }}>
-          <ResponsiveContainer width="50%" height={250} style={{ borderRadius: 20, backgroundColor: 'white' }}>
+          <ResponsiveContainer width="35%" height={250} style={{ borderRadius: 20, backgroundColor: 'white' }}>
             <div style={{ margin: 'auto', textAlign: 'center' }}>
               <div style={{ height: '15px' }}></div>
               <h6>Nombre Visites par type d'attentes</h6>
@@ -301,12 +302,9 @@ const Dashboard = () => {
             <LineChartComponent />
           </ResponsiveContainer>
           <div style={{ width: '20px' }}></div>
-          <ResponsiveContainer width="50%" height={250} style={{ borderRadius: 20, backgroundColor: 'white' }}>
-            <div style={{ margin: 'auto', textAlign: 'center' }}>
-              <div style={{ height: '15px' }}></div>
-              <h6>Nombre de Visites par Commune</h6>
-            </div>
-            <BarChart />
+          <ResponsiveContainer width="63%" >
+            
+            <PieChartComponent2 />
           </ResponsiveContainer>
         </div>
         <div style={{ height: '20px' }}></div>

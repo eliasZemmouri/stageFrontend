@@ -20,9 +20,9 @@ const LineChartComponent = () => {
         <YAxis />
         <Tooltip />
         <Legend />
-        <Line type="monotone" dataKey="petit" stroke="#8884d8" activeDot={{ r: 8 }} />
-        <Line type="monotone" dataKey="moyen" stroke="#82ca9d" />
-        <Line type="monotone" dataKey="grand" stroke="#f5abe5" />
+        <Line type="monotone" dataKey="petit" stroke="#0088FE" activeDot={{ r: 8 }} />
+        <Line type="monotone" dataKey="moyen" stroke="#00C49F" />
+        <Line type="monotone" dataKey="grand" stroke="#FFBB28" />
       </LineChart>
     </ResponsiveContainer>
   );

@@ -5,6 +5,8 @@ import monImage from '../images/s-a.png';
 import { ResponsiveContainer } from 'recharts';
 import PieChartComponent from '../Components/DashboardComponents/PieChart2';
 import LineChartComponent from '../Components/DashboardComponents/LineChart';
+import BarChart from '../Components/DashboardComponents/BarChart';
+import BarChart2 from '../Components/DashboardComponents/BarChart2';
 
 
 const Dashboard2 = () => {
@@ -124,21 +126,27 @@ const Dashboard2 = () => {
         </div>
         <div style={{ marginLeft: '20px' }}></div>
       </div>
-
-      <ResponsiveContainer width="100%" height={130}>
-        <PieChartComponent />
-      </ResponsiveContainer>
-      <div style={{ height: '175px' }}></div>
-      <ResponsiveContainer width="80%" height={250} style={{ borderRadius: 20, backgroundColor: 'white' }}>
-            <div style={{ margin: 'auto', textAlign: 'center' }}>
-              <div style={{ height: '15px' }}></div>
-              <h6>Nombre Visites par type d'attentes</h6>
-            </div>
-            <LineChartComponent />
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '15px' }}>  
+        <div style={{ display: 'flex', width: '80%' }}>  
+          <ResponsiveContainer width="50%" height={250} style={{ borderRadius: 20, backgroundColor: 'white' }}>
+                <div style={{ margin: 'auto', textAlign: 'center' }}>
+                  <div style={{ height: '15px' }}></div>
+                  <h6>Nombre de Visites par Commune</h6>
+                </div>
+                <BarChart />
           </ResponsiveContainer>
+          <div style={{ width: '20px' }}></div>
+          <ResponsiveContainer width="50%" height={250} style={{ borderRadius: 20, backgroundColor: 'white' }}>
+                <div style={{ margin: 'auto', textAlign: 'center' }}>
+                  <div style={{ height: '15px' }}></div>
+                  <h6>Nombre de Visites par Commune et par société</h6>
+                </div>
+                <BarChart2 />
+          </ResponsiveContainer>
+        </div>  
 
-      <div style={{ height: '175px' }}></div>
-
+        <div style={{ height: '175px' }}></div>
+      </div> 
       <div
         style={{
           position: 'fixed',
