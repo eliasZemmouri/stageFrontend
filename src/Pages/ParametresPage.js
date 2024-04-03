@@ -124,21 +124,19 @@ const SettingsPage = () => {
             </ul>
           </div>
           <div className="section-container">
-            <h2>Temps Attente</h2>
+            <h2>A Venir</h2>
             <ul>
-              {[0, 1, 2].map((index) => (
-                <li key={index}>
-                  Plus petit que:
-                  <input
-                    type="number"
-                    style={{ width: '20%' }}
-                    value={tempsAttenteValues[index]}
-                    onChange={(e) => handleInputChange('tempsAttente', index, e.target.value)}
-                  />
-                </li>
-              ))}
+              
               <li>
-                Plus grand que:
+                Temps avant l'heure du RDV:
+                <input
+                  type="number"
+                  style={{ width: '20%' }}
+                  value={tempsAttenteValues[0]}
+                />
+              </li>
+              <li>
+                Temps apres l'heure du RDV:
                 <input
                   type="number"
                   style={{ width: '20%' }}
@@ -149,26 +147,15 @@ const SettingsPage = () => {
             </ul>
           </div>
           <div className="section-container">
-            <h2>Temps Attente</h2>
+            <h2>Avance</h2>
             <ul>
-              {[0, 1, 2].map((index) => (
-                <li key={index}>
-                  Plus petit que:
-                  <input
-                    type="number"
-                    style={{ width: '20%' }}
-                    value={tempsAttenteValues[index]}
-                    onChange={(e) => handleInputChange('tempsAttente', index, e.target.value)}
-                  />
-                </li>
-              ))}
               <li>
-                Plus grand que:
+                durée avant l'etat A Venir:
                 <input
                   type="number"
                   style={{ width: '20%' }}
-                  value={tempsAttenteValues[2]} // The "Plus grand que" field should be the same as the last "Plus petit que"
-                  readOnly
+                  value={tempsAttenteValues[0]} // The "Plus grand que" field should be the same as the last "Plus petit que"
+                  
                 />
               </li>
             </ul>
