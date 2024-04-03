@@ -275,7 +275,7 @@ const Dashboard = () => {
         <div style={{ marginLeft: '20px' }}></div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '15px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '50px' }}>
         <div>
           <div style={{border:'1px solid #ccc', display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: '20px', backgroundColor:'white'}}><h4 style={{marginTop: '10px', marginBottom:'5px'}}>Total Rendez-vous : <span style={{ color: '#2BB67D' }}>{totalRendezvousWithoutCancelled}</span> pour une limite de : <span style={{ color: '#2BB67D' }}>x</span> visites</h4></div>
           <div className="state-container">

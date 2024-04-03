@@ -126,26 +126,26 @@ const Dashboard2 = () => {
         </div>
         <div style={{ marginLeft: '20px' }}></div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '15px' }}>  
-        <div style={{ display: 'flex', width: '80%' }}>  
-          <ResponsiveContainer width="50%" height={250} style={{ borderRadius: 20, backgroundColor: 'white' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '50px' }}>  
+        
+          <ResponsiveContainer width="100%" height={250} style={{ borderRadius: 20, backgroundColor: 'white' }}>
                 <div style={{ margin: 'auto', textAlign: 'center' }}>
                   <div style={{ height: '15px' }}></div>
                   <h6>Nombre de Visites par Commune</h6>
                 </div>
                 <BarChart />
           </ResponsiveContainer>
-          <div style={{ width: '20px' }}></div>
-          <ResponsiveContainer width="50%" height={250} style={{ borderRadius: 20, backgroundColor: 'white' }}>
+          <div style={{ height: '25px' }}></div>
+          <ResponsiveContainer width="100%" height={250} style={{ borderRadius: 20, backgroundColor: 'white' }}>
                 <div style={{ margin: 'auto', textAlign: 'center' }}>
                   <div style={{ height: '15px' }}></div>
                   <h6>Nombre de Visites par Commune et par société</h6>
                 </div>
                 <BarChart2 />
           </ResponsiveContainer>
-        </div>  
+        
 
-        <div style={{ height: '175px' }}></div>
+        
       </div> 
       <div
         style={{

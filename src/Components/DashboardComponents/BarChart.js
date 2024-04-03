@@ -15,28 +15,48 @@ const data = [
     amt: 2210,
   },
   {
-    name: 'Ixelles',
+    name: 'Bruxelles',
     uv: 2000,
     visites: 9800,
     amt: 2290,
   },
   {
-    name: 'Evere',
+    name: 'Saint-Gilles',
     uv: 2780,
     visites: 3908,
     amt: 2000,
   },
   {
-    name: 'Molenbeek',
+    name: 'Molenbeek-Saint-Jean',
     uv: 1890,
     visites: 4800,
     amt: 2181,
   },
   {
-    name: 'Vilvoorde',
+    name: 'Koekelberg',
     uv: 2390,
     visites: 3800,
     amt: 2500,
+  },{
+    name: 'Berchem-Sainte-Agathe',
+    uv: 3490,
+    visites: 4300,
+    amt: 2100,
+  },{
+    name: 'Ganshoren',
+    uv: 3490,
+    visites: 4300,
+    amt: 2100,
+  },{
+    name: 'Jette',
+    uv: 3490,
+    visites: 4300,
+    amt: 2100,
+  },{
+    name: 'Uccle',
+    uv: 3490,
+    visites: 4300,
+    amt: 2100,
   },
   {
     name: 'Autre',

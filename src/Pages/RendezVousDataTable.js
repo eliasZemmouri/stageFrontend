@@ -11,7 +11,7 @@ import monImage from '../images/s-a.png';
 
 const RendezVousDataTable = () => {
   const [data, setData] = useState([]);
-  const [selectedState, setSelectedState] = useState('Avenir');
+  const [selectedState, setSelectedState] = useState('A venir');
   const [globalFilter, setGlobalFilter] = useState('');
   const [selectedST, setSelectedST] = useState(null);
 
@@ -22,11 +22,41 @@ const RendezVousDataTable = () => {
         const response = await httpClient.get(`/api/bookings/details/TODAY/${selectedST}`);
         const bookingDetailsArray = response.data.map((item) => {
           const { bookingDetails, rendezVousEtat } = item;
+          const jsonString = rendezVousEtat.raisonRefus;
+          const jsonStringA = rendezVousEtat.ligne;
+          console.log("shesh "+jsonStringA);
+          let deuxiemeValeur;
+          let deuxiemeValeurA;
+          try {
+              // Convertir la chaîne JSON en objet JavaScript
+              const jsonObject = JSON.parse(jsonString);
+              // Extraire la deuxième valeur
+              
+              deuxiemeValeur = Object.values(jsonObject)[0];
+
+            } catch (error) {
+              console.error(error);
+          }
+          try {
+            // Convertir la chaîne JSON en objet JavaScript
+           
+            const jsonObjectA = JSON.parse(jsonStringA);
+            // Extraire la deuxième valeur
+            
+            deuxiemeValeurA = Object.values(jsonObjectA)[0];
+
+          } catch (error) {
+            console.error(error);
+        }
           return {
             ...bookingDetails,
-            etat: rendezVousEtat.etat // Ajoutez la propriété etat
+            etat: rendezVousEtat.etat, // Ajoutez la propriété etat
+            raisonRefus: deuxiemeValeur,
+            ligne: deuxiemeValeurA,
           };
+          
         });
+        console.log(bookingDetailsArray);
         setData(bookingDetailsArray);
       } catch (error) {
         console.error('Error fetching data:', error.message);
@@ -70,10 +100,10 @@ const RendezVousDataTable = () => {
   };
   const handleAddClick = () => {
     Swal.fire({
-        title: 'Ajouter un rendez-vous',
+        title: 'Accepter un  sans rendez-vous',
         html:
             '<input id="plaque" class="swal2-input" style="margin-bottom: 30px;" placeholder="Plaque">' +
-            '<div style="margin-bottom: 20px;"><input type="radio" id="accordChef" name="accordType" value="accordChef" style="transform: scale(1.5);"><label for="accordChef" style="margin-left: 5px;">Accord Chef</label><input type="radio" id="euemST" name="accordType" value="erreurST" style="transform: scale(1.5); margin-left: 20px;"><label for="erreurST" style="margin-left: 5px;">Erreur ST</label></div>' +
+            '<div style="margin-bottom: 20px;"><input type="radio" id="accordChef" name="accordType" value="accordChef" style="transform: scale(1.5);"><label for="accordChef" style="margin-left: 5px;">Accord Chef</label><input type="radio" id="euemST" name="accordType" value="Mauvaise Station" style="transform: scale(1.5); margin-left: 20px;"><label for="erreurST" style="margin-left: 5px;">Mauvaise Station</label></div>' +
             '<select id="choix" class="swal2-select">' +
             '<option value="periodique">Periodique</option>' +
             '<option value="occasion">Occasion</option>' +
@@ -139,17 +169,28 @@ const RendezVousDataTable = () => {
     </div>
   );
 
-  const actionButtons = (rowData) => (
-    <div>
-      <button className="btn btn-success" onClick={() => handleAccept(rowData)}>
-        Valider
-      </button>
-      <span style={{ margin: '0 10px' }}></span> {/* Ajout de l'espace entre les boutons */}
-      <button className="btn btn-danger" onClick={() => handleReject(rowData)}>
-        Refuser
-      </button>
-    </div>
-  );
+  const actionButtons = (rowData) => {
+    if (rowData.etat === 'ACCEPTE' || rowData.etat === 'REFUSE') {
+      return (
+        <button className="btn btn-primary" onClick={() => handleRecovery(rowData)}>
+          Récupération
+        </button>
+      );
+    } else {
+      return (
+        <div>
+          <button className="btn btn-success" onClick={() => handleAccept(rowData)}>
+            Valider
+          </button>
+          <span style={{ margin: '0 10px' }}></span> {/* Ajout de l'espace entre les boutons */}
+          <button className="btn btn-danger" onClick={() => handleReject(rowData)}>
+            Refuser
+          </button>
+        </div>
+      );
+    }
+  };
+  
 
   const handleAccept = (rowData) => {
     Swal.fire({
@@ -166,16 +207,35 @@ const RendezVousDataTable = () => {
           return 'Vous devez choisir une Ligne!';
         }
       }
-    }).then((result) => {
+    }).then(async (result) => {
+      
       if (result.isConfirmed) {
-        const ligne = result.value;
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: `${ligne}`,
-          showConfirmButton: false,
-          timer: 1000
-        });
+        try{
+          const Ligne = result.value;
+          const response = await httpClient.post(`/api/bookings/accepter/${rowData.id}`, {Ligne} );
+          console.log('Réponse de l\'API:', response.data);
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: response.data,
+            showConfirmButton: false,
+            timer: 1000
+          });
+          // Mettre à jour l'état du rendez-vous refusé dans le tableau de données
+          const updatedData = data.map(item => {
+            if (item.id === rowData.id) {
+              return { ...item, etat: 'ACCEPTE', ligne: Ligne };
+            }
+            return item;
+          });
+          setData(updatedData);
+        }
+        catch (error) {
+          console.error('Erreur lors de l\'appel de l\'API:', error);
+          // Afficher un message d'erreur ou effectuer d'autres actions en cas d'erreur
+          Swal.fire('Erreur', "Une erreur s'est produite lors de l'acceptation du rendez-vous.", 'error');
+        }
+        
         
       }
     });
@@ -185,8 +245,8 @@ const RendezVousDataTable = () => {
   const handleReject =async (rowData) => {
     
     Swal.fire({
-      title: 'Accepter la réservation',
-      text: 'Veuillez sélectionner une Ligne:',
+      title: 'Refuser la réservation',
+      text: 'Veuillez sélectionner une Raison:',
       input: 'radio',
       inputOptions: {
         'Trop tot': 'Trop tot',
@@ -218,7 +278,7 @@ const RendezVousDataTable = () => {
           // Mettre à jour l'état du rendez-vous refusé dans le tableau de données
           const updatedData = data.map(item => {
             if (item.id === rowData.id) {
-              return { ...item, etat: 'REFUSE' };
+              return { ...item, etat: 'REFUSE', raisonRefus: Refus };
             }
             return item;
           });
@@ -235,13 +295,47 @@ const RendezVousDataTable = () => {
     
     console.log('Reject:', rowData);
 
+  }; 
+
+  const handleRecovery = async (rowData) => {
+    try {
+      // Effectuez ici l'appel à l'API pour gérer la récupération du rendez-vous
+      // Par exemple, vous pouvez appeler votre endpoint API avec l'ID du rendez-vous
+      // pour indiquer que le rendez-vous doit être récupéré.
+      let et;
+      if(rowData.etat==="ACCEPTE"){
+        et = "AVENIR";
+      }else if(rowData.etat==="REFUSE"){
+        et = "AVENIR";
+      }
+      const response = await httpClient.post(`/api/bookings/recovery/${rowData.id}/${et}`);
+      
+      // Affichez un message de succès si l'appel à l'API réussit
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: response.data,
+        showConfirmButton: false,
+        timer: 1000
+      });
+  
+      // Vous pouvez mettre à jour l'état ou les données si nécessaire après la récupération
+      // Par exemple, vous pouvez actualiser les données pour refléter que le rendez-vous a été récupéré.
+  
+    } catch (error) {
+      // Gérez les erreurs ici, affichez un message d'erreur ou effectuez d'autres actions nécessaires
+      console.error('Erreur lors de la récupération du rendez-vous:', error);
+      Swal.fire('Erreur', "Une erreur s'est produite lors de la récupération du rendez-vous.", 'error');
+    }
   };
+  
 
   const formattedLastUpdate = () => {
     const now = new Date();
     const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
     return now.toLocaleDateString('fr-FR', options);
   };
+  
 
   return (
     <div>
@@ -296,37 +390,41 @@ const RendezVousDataTable = () => {
               <div style={{ marginLeft: '20px' }}></div>
             </div>
           </div>
-          <div className="container-fluid mt-4 main-container">
-            <div className="custom-table-container">
-              <DataTable
-                value={data.filter(row => {
-                  if (selectedState === 'Refusé') {
-                    return row.etat === 'REFUSE';
-                  }else if(selectedState === 'Validé'){
-                    return row.etat === 'ACCEPTE';
-                  }else {
-                    return row.etat === selectedState.toUpperCase();
-                  }
-                })}
-                stripedRows
-                className="p-datatable-striped"
-                scrollable
-                scrollHeight="calc(80vh - 120px)"
-                globalFilter={globalFilter}
-                header={globalFilterElement}
-                emptyMessage="Aucun rendez-vous trouvé."
-              >
-                <Column field="heure" header="Heure" style={{ width: '5%' }} />
-                <Column field="id" header="RDV" style={{ width: '7%' }} />
-                <Column field="plaque" header="Plaque" style={{ width: '8%' }} />
-                <Column field="chassis" header="Chassis" style={{ width: '14%' }} />
-                <Column field="source" header="Source" style={{ width: '6%' }} />
-                <Column field="client" header="Client" style={{ width: '15%' }} />
-                <Column field="typeDeVisite" header="Type de Visite" style={{ width: '10%' }} />
-                <Column field="Ligne" header="Ligne" style={{ width: '2%' }} />
-                <Column field="vehicule" header="Véhicule" style={{ width: '15%' }} />
-                <Column body={actionButtons} header="Actions" style={{ width: '23%' }} />
-              </DataTable>
+          <div style={{ marginTop: '50px' }}>
+          
+            <div className="container-fluid mt-4 main-container" >
+              <div className="custom-table-container">
+                <DataTable
+                  value={data.filter(row => {
+                    if (selectedState === 'Refusé') {
+                      return row.etat === 'REFUSE';
+                    }else if(selectedState === 'Validé'){
+                      return row.etat === 'ACCEPTE';
+                    }else {
+                      return row.etat === selectedState.toUpperCase();
+                    }
+                  })}
+                  stripedRows
+                  className="p-datatable-striped"
+                  scrollable
+                  scrollHeight="calc(80vh - 120px)"
+                  globalFilter={globalFilter}
+                  header={globalFilterElement}
+                  emptyMessage="Aucun rendez-vous trouvé."
+                >
+                  <Column field="heure" header="Heure" style={{ width: '5%' }} />
+                  <Column field="id" header="RDV" style={{ width: '3%' }} />
+                  <Column field="plaque" header="Plaque" style={{ width: '8%' }} />
+                  <Column field="chassis" header="Chassis" style={{ width: '5%' }} />
+                  <Column field="source" header="Source" style={{ width: '6%' }} />
+                  <Column field="client" header="Client" style={{ width: '15%' }} />
+                  <Column field="typeDeVisite" header="Type de Visite" style={{ width: '10%' }} />
+                  <Column field="ligne" header="Ligne" style={{ width: '2%' }} />
+                  <Column field="raisonRefus" header="Raison" style={{ width: '5%' }} />
+                  <Column field="vehicule" header="Véhicule" style={{ width: '15%' }} />
+                  <Column body={actionButtons} header="Actions" style={{ width: '23%' }} />
+                </DataTable>
+              </div>
             </div>
           </div>
         </div>
