@@ -2,7 +2,7 @@
   border: 1px solid #ccc;
   user-select: none;
   border-radius: 20px;
-  background-color: #b3eef8
+  background-color: rgba(0, 0, 0, 0.177)
 }
 .page-container {
   width: 100%;
@@ -20,6 +20,9 @@
   border-radius: 20px;
   background-color: white;
   max-width: 40%; /* ou toute autre valeur qui convient */
+  -webkit-box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.2);
+  -moz-box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.2);
 }
 
 .header-container {

@@ -302,13 +302,37 @@ const RendezVousDataTable = () => {
       // Effectuez ici l'appel à l'API pour gérer la récupération du rendez-vous
       // Par exemple, vous pouvez appeler votre endpoint API avec l'ID du rendez-vous
       // pour indiquer que le rendez-vous doit être récupéré.
-      let et;
-      if(rowData.etat==="ACCEPTE"){
-        et = "AVENIR";
-      }else if(rowData.etat==="REFUSE"){
-        et = "AVENIR";
+      let et="A VENIR";
+
+      // Heure actuelle
+      const heureActuelle = new Date();
+
+      // Calculer l'heure actuelle moins 15 minutes
+      const heureActuelleMoins15 = new Date(heureActuelle.getTime() - 15 * 60 * 1000); // 15 minutes en millisecondes
+
+      // Calculer l'heure actuelle plus 15 minutes
+      const heureActuellePlus15 = new Date(heureActuelle.getTime() + 15 * 60 * 1000); // 15 minutes en millisecondes
+
+      // Extraire les heures et les minutes de rowData.heure
+      const [rowDataHeureHeure, rowDataHeureMinute] = rowData.heure.split(':').map(Number);
+
+      // Convertir rowData.heure en objet Date
+      const rowDataDate = new Date();
+      rowDataDate.setHours(rowDataHeureHeure);
+      rowDataDate.setMinutes(rowDataHeureMinute);
+
+      // Vérifier si rowData.heure est dans l'intervalle de 15 minutes autour de l'heure actuelle
+      if (rowDataDate > heureActuelleMoins15 && rowDataDate < heureActuellePlus15) {
+          et= "A VENIR";
+      } else if (rowDataDate < heureActuelleMoins15) {
+          et= "RETARD";
+      } else if (rowDataDate > heureActuellePlus15) {
+          et= "AVANCE"
+      } else {
+          et= "A VENIR";
       }
-      const response = await httpClient.post(`/api/bookings/recovery/${rowData.id}/${et}`);
+
+      const response = await httpClient.post(`/api/bookings/recuperer/${rowData.id}/${et}`);
       
       // Affichez un message de succès si l'appel à l'API réussit
       Swal.fire({
@@ -319,8 +343,14 @@ const RendezVousDataTable = () => {
         timer: 1000
       });
   
-      // Vous pouvez mettre à jour l'état ou les données si nécessaire après la récupération
-      // Par exemple, vous pouvez actualiser les données pour refléter que le rendez-vous a été récupéré.
+      // Mettre à jour l'état du rendez-vous refusé dans le tableau de données
+      const updatedData = data.map(item => {
+        if (item.id === rowData.id) {
+          return { ...item, etat: et };
+        }
+        return item;
+      });
+      setData(updatedData);
   
     } catch (error) {
       // Gérez les erreurs ici, affichez un message d'erreur ou effectuez d'autres actions nécessaires

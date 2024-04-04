@@ -52,7 +52,7 @@ const SettingsPage = () => {
       <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px', paddingBottom: '30px' }} />
       <div className='bloc'>
         <div className="header-container">
-          <div style={{ marginLeft: '20px' }}><h2>Paramètres</h2></div>
+          <div style={{ marginLeft: '20px' }}><h2 >Paramètres</h2></div>
           <div style={{ marginRight: '20px' }}>
             <button className="save-button" onClick={() => handleSaveClick(1)}>
               Enregistrer
