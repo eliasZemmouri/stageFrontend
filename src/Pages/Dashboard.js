@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { PieChart, ResponsiveContainer } from 'recharts';
 import LineChartComponent from '../Components/DashboardComponents/LineChart';
 import PieChartComponent from '../Components/DashboardComponents/PieChart';
@@ -31,10 +33,7 @@ const Dashboard = () => {
   const [filters, setFilters] = useState({});
   const [dialogVisible, setDialogVisible] = useState(false);
   const [selectedState, setSelectedState] = useState(null);
-
-  //juste en attendant une solution j'affiche PieChart apres le get
-  //const [isDataLoaded, setIsDataLoaded] = useState(false);
-
+  const [dateRange, setDateRange] = useState({ startDate: new Date(), endDate: new Date() });
 
   useEffect(() => {
     const defaultStates = [
@@ -207,6 +206,13 @@ const Dashboard = () => {
     navigate('/dashboard2');
   };
 
+  const handleDateRangeChange = (dates) => {
+    setDateRange({
+      startDate: dates[0],
+      endDate: dates[1]
+    });
+  };
+
   return (
     <div style={{ userSelect: 'none', marginLeft: '75px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -215,28 +221,26 @@ const Dashboard = () => {
           <p style={{ whiteSpace: 'nowrap', marginTop: '10px' }}>Dernière Maj : {formattedLastUpdate()}</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <select
-            className="form-select"
-            value={selectedOption}
-            onChange={handleDropdownChange}
-            style={{
-              borderRadius: '20px',
-              padding: '8px 16px',
-              fontSize: '16px',
-              border: '2px solid #007BFF',
-              backgroundColor: 'white',
-              color: '#333',
-              outline: 'none',
-              cursor: 'pointer',
-              width: '150px',
-            }}
-          >
-            {dropdownOptions.map((option, index) => (
-              <option key={index} value={option} style={{ backgroundColor: '#f5f5f5', color: '#333' }}>
-                {option}
-              </option>
-            ))}
-          </select>
+        <DatePicker
+          selected={dateRange.startDate}
+          onChange={(date) => handleDateRangeChange([date, dateRange.endDate])}
+          selectsStart
+          startDate={dateRange.startDate}
+          endDate={dateRange.endDate}
+          dateFormat="dd/MM/yyyy"
+          placeholderText="Début"
+        />
+        <span style={{ margin: '0 10px' }}> --&rsaquo; </span>
+        <DatePicker
+          selected={dateRange.endDate}
+          onChange={(date) => handleDateRangeChange([dateRange.startDate, date])}
+          selectsEnd
+          startDate={dateRange.startDate}
+          endDate={dateRange.endDate}
+          minDate={dateRange.startDate}
+          dateFormat="dd/ MM/yyyy"
+          placeholderText="Fin"
+        />
           <div style={{ marginLeft: '20px' }}></div>
           <select
             className="form-select"
@@ -375,4 +379,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

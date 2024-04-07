@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { Button } from 'primereact/button';
 import monImage from '../images/s-a.png';
 import { ResponsiveContainer } from 'recharts';
@@ -16,6 +18,7 @@ const Dashboard2 = () => {
   const [dropdownOptions, setDropdownOptions] = useState(["aujourd'hui", "semaine", "mois"]);
   const [isButtonClicked, setIsButtonClicked] = useState(false);
   const [selectedState, setSelectedState] = useState(null);
+  const [dateRange, setDateRange] = useState({ startDate: new Date(), endDate: new Date() });
 
   useEffect(() => {
     const savedSelectedOption = localStorage.getItem('selectedOption');
@@ -59,6 +62,13 @@ const Dashboard2 = () => {
     window.location.reload();
   };
 
+  const handleDateRangeChange = (dates) => {
+    setDateRange({
+      startDate: dates[0],
+      endDate: dates[1]
+    });
+  };
+
   return (
     <div style={{ textAlign: 'center', marginLeft: '75px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -67,28 +77,26 @@ const Dashboard2 = () => {
           <p style={{ whiteSpace: 'nowrap', marginTop: '10px' }}>Dernière Maj : {formattedLastUpdate()}</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <select
-            className="form-select"
-            value={selectedOption}
-            onChange={handleDropdownChange}
-            style={{
-              borderRadius: '20px',
-              padding: '8px 16px',
-              fontSize: '16px',
-              border: '2px solid #007BFF',
-              backgroundColor: 'white',
-              color: '#333',
-              outline: 'none',
-              cursor: 'pointer',
-              width: '150px',
-            }}
-          >
-            {dropdownOptions.map((option, index) => (
-              <option key={index} value={option} style={{ backgroundColor: '#f5f5f5', color: '#333' }}>
-                {option}
-              </option>
-            ))}
-          </select>
+        <DatePicker
+          selected={dateRange.startDate}
+          onChange={(date) => handleDateRangeChange([date, dateRange.endDate])}
+          selectsStart
+          startDate={dateRange.startDate}
+          endDate={dateRange.endDate}
+          dateFormat="dd/MM/yyyy"
+          placeholderText="Début"
+        />
+        <span style={{ margin: '0 10px' }}> --&rsaquo; </span>
+        <DatePicker
+          selected={dateRange.endDate}
+          onChange={(date) => handleDateRangeChange([dateRange.startDate, date])}
+          selectsEnd
+          startDate={dateRange.startDate}
+          endDate={dateRange.endDate}
+          minDate={dateRange.startDate}
+          dateFormat="dd/ MM/yyyy"
+          placeholderText="Fin"
+        />
           <div style={{ marginLeft: '20px' }}></div>
           <select
             className="form-select"
