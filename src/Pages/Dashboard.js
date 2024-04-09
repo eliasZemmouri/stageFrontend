@@ -17,6 +17,8 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import Papa from 'papaparse';
+import { format } from 'date-fns'; // Importer la fonction de format de date
+
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -33,7 +35,7 @@ const Dashboard = () => {
   const [filters, setFilters] = useState({});
   const [dialogVisible, setDialogVisible] = useState(false);
   const [selectedState, setSelectedState] = useState(null);
-  const [dateRange, setDateRange] = useState({ startDate: new Date(), endDate: new Date() });
+  const [dateRange, setDateRange] = useState(JSON.parse(localStorage.getItem('dateRange')) || { startDate: new Date(), endDate: new Date() });
 
   useEffect(() => {
     const defaultStates = [
@@ -49,21 +51,28 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        let apiUrl;
-        switch (selectedOption) {
-          case "aujourd'hui":
-            apiUrl = `/api/bookings/details/TODAY/${selectedSTOption}`;
-            break;
-          case "semaine":
-            apiUrl = `/api/bookings/details/THIS_WEEK/${selectedSTOption}`;
-            break;
-          case "mois":
-            apiUrl = `/api/bookings/details/THIS_MONTH/${selectedSTOption}`;
-            break;
-          default:
-            apiUrl =  `/api/bookings/details/TODAY/${selectedSTOption}`;
-        }
+        // Début de la plage horaire
+        const debut = new Date(dateRange.startDate); // Utilise la date sélectionnée par l'utilisateur
+        debut.setHours(5); // Définit l'heure choisie
+        debut.setMinutes(45); // Définit les minutes choisies
+        debut.setSeconds(0); // Définit les secondes à zéro
+        debut.setMilliseconds(0); // Définit les millisecondes à zéro
+
+        // Fin de la plage horaire
+        const fin = new Date(dateRange.endDate); // Utilise la date sélectionnée par l'utilisateur
+        fin.setHours(19); // Définit l'heure choisie
+        fin.setMinutes(19); // Définit les minutes choisies
+        fin.setSeconds(0); // Définit les secondes à zéro
+        fin.setMilliseconds(0); // Définit les millisecondes à zéro
+
+        // Convertit les dates au format ISO 8601 pour les inclure dans l'URL
+        const debutISO = debut.toISOString();
+        const finISO = fin.toISOString();
+        const apiUrl = `/api/bookings/details/${selectedSTOption}/${debutISO}/${finISO}`;
+        const requestData = "lekker";   
         const response = await httpClient.get(apiUrl);
+
+
         const data = response.data;
         //setIsDataLoaded(true);
         const stateQuantities = {};
@@ -207,10 +216,17 @@ const Dashboard = () => {
   };
 
   const handleDateRangeChange = (dates) => {
-    setDateRange({
+    // Utiliser le dateRange enregistré s'il existe, sinon utiliser la date actuelle
+    const newDateRange = {
       startDate: dates[0],
       endDate: dates[1]
-    });
+    };
+
+    // Mettre à jour le state dateRange
+    setDateRange(newDateRange);
+
+    // Enregistrer le nouveau dateRange dans le localStorage
+    localStorage.setItem('dateRange', JSON.stringify(newDateRange));
   };
 
   return (

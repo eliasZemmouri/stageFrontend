@@ -19,12 +19,14 @@ const RendezVousDataTable = () => {
     const fetchData = async () => {
       try {
         if (!selectedST) return;
-        const response = await httpClient.get(`/api/bookings/details/TODAY/${selectedST}`);
+        const apiUrl = '/api/bookings/details';
+        const response = await httpClient.get(apiUrl + `/${selectedST}`);
+
         const bookingDetailsArray = response.data.map((item) => {
           const { bookingDetails, rendezVousEtat } = item;
           const jsonString = rendezVousEtat.raisonRefus;
           const jsonStringA = rendezVousEtat.ligne;
-          console.log("shesh "+jsonStringA);
+          
           let deuxiemeValeur;
           let deuxiemeValeurA;
           try {
@@ -252,6 +254,7 @@ const RendezVousDataTable = () => {
         'Trop tot': 'Trop tot',
         'Trop tard': 'Trop tard',
         'Mauvais véhicule': 'Mauvais véhicule',
+        'Mauvaise visite': 'Mauvaise visite',
         'Comportement': 'Comportement',
         'Autre': 'Autre'
       },

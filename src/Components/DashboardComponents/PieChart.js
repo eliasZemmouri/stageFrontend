@@ -24,19 +24,9 @@ const Example = () => {
       try { 
         setLoading(true); // Set loading to true when fetching data
         let apiUrl;
-        switch(selectedOption) {
-          case "aujourd'hui":
-            apiUrl = `/api/bookings/details/TODAY/${selectedStation}`; // Utiliser la station sélectionnée dans l'URL de l'API
-            break;
-          case "semaine":
-            apiUrl = `/api/bookings/details/THIS_WEEK/${selectedStation}`;
-            break;
-          case "mois":
-            apiUrl = `/api/bookings/details/THIS_MONTH/${selectedStation}`;
-            break;
-          default:
-            apiUrl = `/api/bookings/details/TODAY/${selectedStation}`;
-        }
+        
+            apiUrl = `/api/bookings/details/${selectedStation}`; // Utiliser la station sélectionnée dans l'URL de l'API
+            
         const response = await httpClient.get(apiUrl);
         const fetchedData = response.data;
 
