@@ -70,7 +70,7 @@ const Dashboard2 = () => {
   };
 
   return (
-    <div style={{ textAlign: 'center', marginLeft: '75px' }}>
+    <div style={{ textAlign: 'center', marginLeft: '85px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px' }} />
         <div style={{ flex: 1, textAlign: 'center' }}>

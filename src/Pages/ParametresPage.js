@@ -48,7 +48,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <div style={{ maxWidth: '95%', height: 'auto', marginLeft: '75px' }}>
+    <div style={{ maxWidth: '95%', height: 'auto', marginLeft: '85px' }}>
       <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px', paddingBottom: '30px' }} />
       <div className='bloc'>
         <div className="header-container">

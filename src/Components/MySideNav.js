@@ -1,55 +1,114 @@
-import React from 'react';
-import SideNav, { NavItem, NavIcon, NavText } from '@trendmicro/react-sidenav';
-import '@trendmicro/react-sidenav/dist/react-sidenav.css';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Drawer, List, ListItem, ListItemIcon, ListItemText, makeStyles, IconButton, Button } from '@material-ui/core';
+import { Home as HomeIcon, Dashboard as DashboardIcon, Settings as SettingsIcon, Menu as MenuIcon, ExitToApp as ExitToAppIcon } from '@material-ui/icons';
 import { kc } from '../Helpers/KeycloakHelper';
 
-function MySideNav() {
-    const navigate = useNavigate();
+const drawerWidth = 73; // Largeur initiale de la barre latérale réduite
+const expandedDrawerWidth = 240; // Largeur de la barre latérale lorsqu'elle est agrandie
 
-    const handleLogout = () => {
-        // Appeler kc.logout pour déconnecter l'utilisateur
-        kc.logout();
-    };
+const useStyles = makeStyles((theme) => ({
+  drawer: {
+    width: drawerWidth,
+    flexShrink: 0,
+    transition: theme.transitions.create(['width'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  drawerExpanded: {
+    width: expandedDrawerWidth,
+    transition: theme.transitions.create(['width'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  drawerPaper: {
+    width: drawerWidth,
+    backgroundColor: '#00adff', // Changer la couleur de fond en bleu
+    transition: theme.transitions.create(['width'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  drawerPaperExpanded: {
+    width: expandedDrawerWidth,
+    transition: theme.transitions.create(['width'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  logoutButton: {
+    marginTop: 'auto',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)', // Fond blanc semi-transparent par défaut
+    '&:hover': {
+      backgroundColor: 'rgba(255, 255, 255, 0.8)', // Fond blanc semi-transparent plus foncé au survol
+    },
+  },
+}));
 
-    return (
-        <SideNav
-            onSelect={(selected) => {
-                console.log(selected);
-                if (selected === 'logout') {
-                    // Retirer la sélection lors de la déconnexion
-                    localStorage.removeItem('selectedST');
-                    // Si l'élément sélectionné est "logout", effectuer la déconnexion
-                    handleLogout();
-                } else {
-                    // Naviguer vers la route correspondante
-                    navigate(selected);
-                }
-            }}
-            className='mysidenav'
-            style={{ userSelect: 'none' }}
+const MySideNav = () => {
+  const classes = useStyles();
+  const [expanded, setExpanded] = useState(false);
+
+  const toggleDrawerWidth = () => {
+    setExpanded(!expanded);
+  };
+
+  const handleLogout = () => {
+    console.log("Déconnexion");
+    localStorage.removeItem('selectedST');
+    localStorage.removeItem('dateRange');
+    kc.logout();
+  };
+
+  return (
+    <Drawer
+      className={`${classes.drawer} ${expanded ? classes.drawerExpanded : ''}`}
+      classes={{
+        paper: `${classes.drawerPaper} ${expanded ? classes.drawerPaperExpanded : ''}`,
+      }}
+      variant="permanent"
+      open={true}
+    >
+      <List>
+        <IconButton onClick={toggleDrawerWidth}>
+          <MenuIcon />
+        </IconButton>
+        <ListItem button component={Link} to="/" >
+          <ListItemIcon>
+            <HomeIcon />
+          </ListItemIcon>
+          {expanded && <ListItemText primary="Home" />}
+        </ListItem>
+        <ListItem button component={Link} to="/dashboard">
+          <ListItemIcon>
+            <DashboardIcon />
+          </ListItemIcon>
+          {expanded && <ListItemText primary="Dashboard" />}
+        </ListItem>
+        <ListItem button component={Link} to="/parametres">
+          <ListItemIcon>
+            <SettingsIcon />
+          </ListItemIcon>
+          {expanded && <ListItemText primary="Settings" />}
+        </ListItem>
+        {/* Ajoutez d'autres éléments de liste pour les routes supplémentaires */}
+      </List>
+      <Button
+        className={classes.logoutButton}
+        fullWidth
+        color="black"
+        variant="outlined"
+        startIcon={<ExitToAppIcon />}
+        onClick={handleLogout}
         >
-            <SideNav.Toggle />
-            <SideNav.Nav defaultSelected="tableau">
-                <NavItem eventKey="/">
-                    <NavIcon><i className='fa fa-fw fa-home' style={{ fontSize: "1.5em" }}></i></NavIcon>
-                    <NavText>Tableau</NavText>
-                </NavItem>
-                <NavItem eventKey="dashboard">
-                    <NavIcon><i className='fa fa-fw fa-line-chart' style={{ fontSize: "1.5em" }}></i></NavIcon>
-                    <NavText>Dashboard</NavText>
-                </NavItem>
-                <NavItem eventKey="parametres">
-                    <NavIcon><i className='fa fa-fw fa-gear' style={{ fontSize: "1.5em" }}></i></NavIcon>
-                    <NavText>Parametres</NavText>
-                </NavItem>
-                <NavItem eventKey="logout">
-                    <NavIcon><i className='fa fa-fw fa-sign-out' style={{ fontSize: "1.5em" }}></i></NavIcon>
-                    <NavText>Logout</NavText>
-                </NavItem>
-            </SideNav.Nav>
-        </SideNav>
-    );
-}
+        {/* Ne pas inclure de texte ici */}
+      </Button>
+
+
+    </Drawer>
+  );
+};
 
 export default MySideNav;

@@ -90,6 +90,8 @@ const RendezVousDataTable = () => {
     { label: 'Retard', value: 'Retard' },
     { label: 'Validé', value: 'Validé' },
     { label: 'Refusé', value: 'Refusé' },
+    { label: 'Sans Rendez-Vous', value: 'SansRendezVous' }, // Ajout de l'état pour les sans rendez-vous
+
     // Ajoutez d'autres états selon vos besoins
   ];
 
@@ -387,7 +389,7 @@ const RendezVousDataTable = () => {
       )}
       {selectedST && (
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginLeft: '75px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginLeft: '85px' }}>
             <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px' }} />
             <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
               <div style={{ textAlign: 'center', flex: 1 }}>
@@ -433,7 +435,9 @@ const RendezVousDataTable = () => {
                       return row.etat === 'REFUSE';
                     }else if(selectedState === 'Validé'){
                       return row.etat === 'ACCEPTE';
-                    }else {
+                    }else if (selectedState === 'Sans Rendez-Vous') { // Filtre pour les rendez-vous sans rendez-vous
+                      return row.etat === 'SansRendezVous';
+                    } else {
                       return row.etat === selectedState.toUpperCase();
                     }
                   })}

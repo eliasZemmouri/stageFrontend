@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { httpClient } from '../../Api/HttpClient';
 
-const Example = () => {
-  const [data, setData] = useState([]);
+const Example = ({ datas }) => {
+  const [data, setData] = useState(datas);
   const [loading, setLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState(localStorage.getItem('selectedOption') || 'aujourd\'hui');
   const [selectedStation, setSelectedStation] = useState(localStorage.getItem('selectedSTOption') || 'ST10'); // Ajout de l'état de la station sélectionnée
@@ -20,20 +20,19 @@ const Example = () => {
     ];
     setData(defaultStates);
 
-    const fetchData = async () => {
-      try { 
-        setLoading(true); // Set loading to true when fetching data
-        let apiUrl;
+    const fetchData =  () => {
+      
+        setLoading(true); // Set loading to false when fetching data
         
-            apiUrl = `/api/bookings/details/${selectedStation}`; // Utiliser la station sélectionnée dans l'URL de l'API
-            
-        const response = await httpClient.get(apiUrl);
-        const fetchedData = response.data;
+        const fetchedData = data;
 
         // Process fetched data as needed
         const stateQuantities = {};
         const retards = { '<15': 0, '<30': 0, '>30': 0 }; // Initialize retards object
         const attentes = { '<15': 0, '<30': 0, '>30': 0 }; // Initialize attentes object
+        if(fetchedData!=null){
+        
+        
         fetchedData.forEach(item => {
           if (item.rendezVousEtat.etat !== 'ANNULE') {
             const stateName = item.rendezVousEtat.etat;
@@ -77,6 +76,7 @@ const Example = () => {
             }
           
           }
+          setLoading(false);
         });
 
         const updatedData = defaultStates.map(({ stateName, quantity }) => ({
@@ -90,12 +90,7 @@ const Example = () => {
           { name: '<30', value: retards['<30'] },
           { name: '>30', value: retards['>30'] }
         ]);
-        setLoading(false); // Set loading to false after fetching data
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        // If there's an error, set default data
-        setData(defaultStates);
-        setLoading(false); // Set loading to false if there's an error
+        
       }
     };
 
