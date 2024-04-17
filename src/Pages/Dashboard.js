@@ -74,6 +74,11 @@ const Dashboard = () => {
 
 
         const data = response.data;
+        for(var i=0;i<data.legth;i++){
+          if(data[i].bookingDetails.idInspection!=null){
+            console.log(data[i]);
+          }
+        }
         //setIsDataLoaded(true);
         const stateQuantities = {};
         const totalRendezvousWithoutCancelledV = data.reduce((acc, item) => {
