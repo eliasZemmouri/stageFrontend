@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { httpClient } from '../../Api/HttpClient';
 
-const Example = ({ datas }) => {
-  const [data, setData] = useState(datas);
+const Example = () => {
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState(localStorage.getItem('selectedOption') || 'aujourd\'hui');
   const [selectedStation, setSelectedStation] = useState(localStorage.getItem('selectedSTOption') || 'ST10'); // Ajout de l'état de la station sélectionnée
@@ -12,7 +12,7 @@ const Example = ({ datas }) => {
 
   useEffect(() => {
     const defaultStates = [
-      { stateName: 'A VENIR', quantity: 0 },
+      { stateName: 'FENETRE', quantity: 0 },
       { stateName: 'ACCEPTE', quantity: 0 },
       { stateName: 'REFUSE', quantity: 0 },
       { stateName: 'SANS_RENDEZVOUS', quantity: 0 },
@@ -20,27 +20,35 @@ const Example = ({ datas }) => {
     ];
     setData(defaultStates);
 
-    const fetchData =  () => {
-      
-        setLoading(true); // Set loading to false when fetching data
+    const fetchData = async () => {
+      try { 
+        setLoading(true); // Set loading to true when fetching data
+        let apiUrl;
         
-        const fetchedData = data;
+            apiUrl = `/api/bookings/details/${selectedStation}`; // Utiliser la station sélectionnée dans l'URL de l'API
+            
+        const response = await httpClient.get(apiUrl);
+        const fetchedData = response.data;
 
         // Process fetched data as needed
         const stateQuantities = {};
         const retards = { '<15': 0, '<30': 0, '>30': 0 }; // Initialize retards object
         const attentes = { '<15': 0, '<30': 0, '>30': 0 }; // Initialize attentes object
-        if(fetchedData!=null){
-        
-        
         fetchedData.forEach(item => {
           if (item.rendezVousEtat.etat !== 'ANNULE') {
-            const stateName = item.rendezVousEtat.etat;
+            let stateName;
+            if(item.rendezVousEtat.etat === 'A VENIR' || item.rendezVousEtat.etat === 'AVANCE' || item.rendezVousEtat.etat === 'RETARD'){
+              stateName = 'FENETRE';
+              item.rendezVousEtat.etat='FENETRE';
+            }else{
+              stateName = item.rendezVousEtat.etat;
+            }
             if (!stateQuantities[stateName]) {
               stateQuantities[stateName] = 0;
             }
             stateQuantities[stateName]++;
-            if (item.rendezVousEtat.etat === 'RETARD') {
+            //A voir pour recuperer que accepter et voir le retard depuis accepte
+            if (item.rendezVousEtat.etat === 'ACCEPTE') {
               // Calculate retards
               const delay = item.rendezVousEtat.tempsModification;
               const date = new Date(delay);
@@ -76,7 +84,6 @@ const Example = ({ datas }) => {
             }
           
           }
-          setLoading(false);
         });
 
         const updatedData = defaultStates.map(({ stateName, quantity }) => ({
@@ -90,7 +97,12 @@ const Example = ({ datas }) => {
           { name: '<30', value: retards['<30'] },
           { name: '>30', value: retards['>30'] }
         ]);
-        
+        setLoading(false); // Set loading to false after fetching data
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        // If there's an error, set default data
+        setData(defaultStates);
+        setLoading(false); // Set loading to false if there's an error
       }
     };
 
@@ -194,7 +206,7 @@ const Example = ({ datas }) => {
           <>
             {/* Tableau 2 */}
             <div style={{ flex: 1, marginRight: '10px' }}>
-              <h5>Retards (min)</h5>
+              <h5>Temps Aprés Présentation (min)</h5>
               <div>
                 {retards.map((item, index) => (
                   <div key={index} style={{ display: 'flex', alignItems: 'center' }}>

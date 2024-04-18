@@ -24,7 +24,6 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [statesData, setStatesData] = useState([]);
-  const [data, setData] = useState([]);
   const [products, setProducts] = useState([]);
   const [totalRendezvousWithoutCancelled, setTotalRendezvousWithoutCancelled] = useState(0);
   const [selectedOption, setSelectedOption] = useState(localStorage.getItem('selectedOption') || 'aujourd\'hui');
@@ -37,7 +36,7 @@ const Dashboard = () => {
   const [dialogVisible, setDialogVisible] = useState(false);
   const [selectedState, setSelectedState] = useState(null);
   const [dateRange, setDateRange] = useState(JSON.parse(localStorage.getItem('dateRange')) || { startDate: new Date(), endDate: new Date() });
-
+  const [dataTransfer, setDataTransfer] = useState("shesh");
   useEffect(() => {
     const defaultStates = [
       { stateName: 'FENETRE', quantity: 0 },
@@ -73,31 +72,23 @@ const Dashboard = () => {
         const requestData = "lekker";   
         const response = await httpClient.get(apiUrl);
 
+        const data = response.data;
+        setDataTransfer(response.data);
 
-        data = response.data;
-        for(var i=0;i<data.legth;i++){
-          if(data[i].bookingDetails.idInspection!=null){
-            console.log(data[i]);
-          }
-        }
-        //setIsDataLoaded(true);
         const stateQuantities = {};
         const totalRendezvousWithoutCancelledV = data.reduce((acc, item) => {
           if (item.rendezVousEtat.etat !== 'ANNULE') {
-            const stateName = item.rendezVousEtat.etat;
+            let stateName;
+            if(item.rendezVousEtat.etat === 'A VENIR' || item.rendezVousEtat.etat === 'AVANCE' || item.rendezVousEtat.etat === 'RETARD'){
+              stateName = 'FENETRE';
+              item.rendezVousEtat.etat='FENETRE';
+            }else{
+              stateName = item.rendezVousEtat.etat;
+            }
             if (!stateQuantities[stateName]) {
               stateQuantities[stateName] = 0;
             }
             stateQuantities[stateName]++;
-            if (stateName === 'FENETRE') {
-              // Pour l'état "FENETRE", également mettre à jour les états "A VENIR", "RETARD" et "AVANCE"
-              ['A VENIR', 'RETARD', 'AVANCE'].forEach(subState => {
-                if (!stateQuantities[subState]) {
-                  stateQuantities[subState] = 0;
-                }
-                stateQuantities[subState]++;
-              });
-            }
             acc++;
           }
           return acc;
@@ -130,7 +121,7 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, [selectedOption]);
+  }, [selectedOption, selectedSTOption, dateRange]); // Update the effect dependencies
 
   useEffect(() => {
     localStorage.setItem('selectedOption', selectedOption);
@@ -196,15 +187,8 @@ const Dashboard = () => {
   };
 
   const getFilteredProductsByState = () => {
-    if (selectedState === 'FENETRE') {
-      // Retourner les produits avec les états "A VENIR", "RETARD" ou "AVANCE"
-      return products.filter((product) => ['A VENIR', 'RETARD', 'AVANCE'].includes(product.state));
-    } else {
-      // Retourner les produits correspondant à l'état sélectionné
-      return products.filter((product) => product.state === selectedState);
-    }
+    return products.filter((product) => product.state === selectedState);
   };
-  
 
   const exportCSV = (data, fileName) => {
     const csv = Papa.unparse(data);
@@ -252,7 +236,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div style={{ userSelect: 'none', marginLeft: '85px' }}>
+    <div style={{ userSelect: 'none', marginLeft: '75px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px' }} />
         <div style={{ flex: 1, textAlign: 'center' }}>
@@ -332,7 +316,7 @@ const Dashboard = () => {
           </div>
         </div>
         <ResponsiveContainer width="80%" height={130}>
-          <PieChartComponent data={data}/>
+          <PieChartComponent data={dataTransfer}/>
         </ResponsiveContainer>
         <div style={{ height: '150px' }}></div>
         <div style={{ display: 'flex', width: '80%' }}>
@@ -345,7 +329,6 @@ const Dashboard = () => {
           </ResponsiveContainer>
           <div style={{ width: '20px' }}></div>
           <ResponsiveContainer width="63%" >
-            
             <PieChartComponent2 />
           </ResponsiveContainer>
         </div>
