@@ -6,10 +6,17 @@ const Example = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState(localStorage.getItem('selectedOption') || 'aujourd\'hui');
-  const [selectedStation, setSelectedStation] = useState(localStorage.getItem('selectedSTOption') || 'ST10'); // Ajout de l'état de la station sélectionnée
+  const [selectedStation, setSelectedStation] = useState(localStorage.getItem('selectedSTOption') || 'ST10');
   const [retardData, setRetardData] = useState([]);
   const [attenteData, setAttenteData] = useState([]);
 
+  useEffect(() => {
+    const storedSelectedOption = localStorage.getItem('selectedOption');
+    const storedSelectedStation = localStorage.getItem('selectedSTOption');
+    setSelectedOption(storedSelectedOption || 'aujourd\'hui');
+    setSelectedStation(storedSelectedStation || 'ST10');
+  }, []);
+  
   useEffect(() => {
     const defaultStates = [
       { stateName: 'FENETRE', quantity: 0 },
@@ -22,67 +29,57 @@ const Example = () => {
 
     const fetchData = async () => {
       try { 
-        setLoading(true); // Set loading to true when fetching data
+        setLoading(true);
         let apiUrl;
         
-            apiUrl = `/api/bookings/details/${selectedStation}`; // Utiliser la station sélectionnée dans l'URL de l'API
-            
+        apiUrl = `/api/bookings/details/${selectedStation}`;
+
         const response = await httpClient.get(apiUrl);
         const fetchedData = response.data;
 
-        // Process fetched data as needed
         const stateQuantities = {};
-        const retards = { '<15': 0, '<30': 0, '>30': 0 }; // Initialize retards object
-        const attentes = { '<15': 0, '<30': 0, '>30': 0 }; // Initialize attentes object
+        const retards = { '<15': 0, '<30': 0, '>30': 0 }; // Déclaration de la variable retards
+        const attentes = { '<15': 0, '<30': 0, '>30': 0 }; // Déclaration de la variable attentes
         fetchedData.forEach(item => {
           if (item.rendezVousEtat.etat !== 'ANNULE') {
             let stateName;
-            if(item.rendezVousEtat.etat === 'A VENIR' || item.rendezVousEtat.etat === 'AVANCE' || item.rendezVousEtat.etat === 'RETARD'){
+            if (item.rendezVousEtat.etat === 'A VENIR' || item.rendezVousEtat.etat === 'AVANCE' || item.rendezVousEtat.etat === 'RETARD') {
               stateName = 'FENETRE';
-              item.rendezVousEtat.etat='FENETRE';
-            }else{
+              item.rendezVousEtat.etat = 'FENETRE';
+            } else {
               stateName = item.rendezVousEtat.etat;
             }
             if (!stateQuantities[stateName]) {
               stateQuantities[stateName] = 0;
             }
             stateQuantities[stateName]++;
-            //A voir pour recuperer que accepter et voir le retard depuis accepte
+
             if (item.rendezVousEtat.etat === 'ACCEPTE') {
-              // Calculate retards
-              const delay = item.rendezVousEtat.tempsModification;
-              const date = new Date(delay);
-              const heures = date.getHours();
-              const minutes = date.getMinutes();
-              const heureMinutes = heures * 60 + minutes;
+              const whenCreated = new Date(item.bookingDetails.whenCreated);
+              const whenUpdated = new Date(item.bookingDetails.whenUpdated);
+              const differenceEnMillisecondes = whenUpdated - whenCreated;
+              const differenceEnMinutes = differenceEnMillisecondes / (1000 * 60);
 
-              // Convertir item.bookingDetails.heure en minutes
-              const heuresBooking = parseInt(item.bookingDetails.heure.split(':')[0]);
-              const minutesBooking = parseInt(item.bookingDetails.heure.split(':')[1]);
-              const heureMinutesBooking = heuresBooking * 60 + minutesBooking;
-
-              // Calculer la différence en minutes
-              const differenceEnMinutes = heureMinutes - heureMinutesBooking;
-              console.log(differenceEnMinutes); // Affiche la différence en minutes
-              if (differenceEnMinutes <= 15) {
+              if (differenceEnMinutes < 15) {
                 retards['<15']++;
-              } else if (differenceEnMinutes <= 30) {
+              } else if (differenceEnMinutes < 30) {
                 retards['<30']++;
               } else {
                 retards['>30']++;
               }
             }
-          // Calculate attentes
-            // Calculate attentes
-            const attente = item.rendezVousEtat.attente;
-            if (attente <= 15) {
-              attentes['<15']++;
-            } else if (attente <= 30) {
-              attentes['<30']++;
-            } else {
-              attentes['>30']++;
+
+            // Calcul pour le temps après la présentation
+            if (item.rendezVousEtat.etat === 'ACCEPTE') {
+              const attente = item.rendezVousEtat.attente;
+              if (attente <= 15) {
+                attentes['<15']++;
+              } else if (attente <= 30) {
+                attentes['<30']++;
+              } else {
+                attentes['>30']++;
+              }
             }
-          
           }
         });
 
@@ -97,28 +94,21 @@ const Example = () => {
           { name: '<30', value: retards['<30'] },
           { name: '>30', value: retards['>30'] }
         ]);
-        setLoading(false); // Set loading to false after fetching data
+        setAttenteData([
+          { name: '<15', value: attentes['<15'] },
+          { name: '<30', value: attentes['<30'] },
+          { name: '>30', value: attentes['>30'] }
+        ]);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
-        // If there's an error, set default data
         setData(defaultStates);
-        setLoading(false); // Set loading to false if there's an error
+        setLoading(false);
       }
     };
 
     fetchData();
-  }, [selectedOption, selectedStation]); // Ajout de selectedStation dans les dépendances
-
-  const retards = [
-    { name: '<15', value: 120 },
-    { name: '<30', value: 90 },
-    { name: '>30', value: 75 },
-  ];
-  const fileAttente = [
-    { name: '<15', value: 120 },
-    { name: '<30', value: 90 },
-    { name: '>30', value: 75 },
-  ];
+  }, [selectedOption, selectedStation]);
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#42ff65', '#ff42d6'];
 
@@ -155,13 +145,11 @@ const Example = () => {
 
   return (
     <div style={{ display: 'flex', margin: '10px' }}>
-      {/* Paire 1 */}
       <div style={{ ...boxStyle, flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', marginRight: marginBetweenPairs, backgroundColor: 'white' }}>
         {loading ? (
           <p>Loading...</p>
         ) : (
           <>
-            {/* Tableau 1 */}
             <div style={{ flex: 1, marginRight: '10px' }}>
               <h5>Etats Rendez-vous</h5>
               <div>
@@ -173,7 +161,6 @@ const Example = () => {
                 ))}
               </div>
             </div>
-            {/* Chart 1 */}
             <div style={{ flex: 1 }}>
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
@@ -198,17 +185,15 @@ const Example = () => {
         )}
       </div>
 
-      {/* Paire 2 */}
       <div style={{ ...boxStyle, flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', marginRight: marginBetweenPairs, backgroundColor: 'white' }}>
         {loading ? (
           <p>Loading...</p>
         ) : (
           <>
-            {/* Tableau 2 */}
             <div style={{ flex: 1, marginRight: '10px' }}>
-              <h5>Temps Aprés Présentation (min)</h5>
+              <h5>Temps Après Présentation (min)</h5>
               <div>
-                {retards.map((item, index) => (
+                {retardData.map((item, index) => (
                   <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
                     <div style={{ width: '20px', height: '20px', backgroundColor: COLORS[index], marginRight: '5px', borderRadius: '50%' }}></div>
                     <div>{item.name}</div>
@@ -216,7 +201,6 @@ const Example = () => {
                 ))}
               </div>
             </div>
-            {/* Chart 2 */}
             <div style={{ flex: 1 }}>
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
@@ -240,43 +224,40 @@ const Example = () => {
           </>
         )}
       </div>
-      {/* Paire 3 */}
+
       <div style={{ ...boxStyle, flex: 1, display: 'flex', flexDirection: 'row', padding: '20px', marginRight: marginBetweenPairs, backgroundColor: 'white' }}>
-          {/* Tableau 3 */}
-          <div style={{ flex: 1, marginRight: '10px' }}>
-            <h5>Temps d'inspection (min)</h5>
-            <div>
-              {retards.map((item, index) => (
-                <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
-                  <div style={{ width: '20px', height: '20px', backgroundColor: COLORS[index], marginRight: '5px', borderRadius: '50%' }}></div>
-                  <div>{item.name}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* Chart 3 */}
-          <div style={{ flex: 1 }}>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={retards}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderCustomizedLabel}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {retards.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
+        <div style={{ flex: 1, marginRight: '10px' }}>
+          <h5>Temps d'inspection (min)</h5>
+          <div>
+            {attenteData.map((item, index) => (
+              <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ width: '20px', height: '20px', backgroundColor: COLORS[index], marginRight: '5px', borderRadius: '50%' }}></div>
+                <div>{item.name}</div>
+              </div>
+            ))}
           </div>
         </div>
-
+        <div style={{ flex: 1 }}>
+          <ResponsiveContainer width="100%" height={200}>
+            <PieChart>
+              <Pie
+                data={attenteData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={renderCustomizedLabel}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {attenteData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
     </div>
   );
 };

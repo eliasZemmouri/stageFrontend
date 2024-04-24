@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, makeStyles, IconButton, Button } from '@material-ui/core';
 import { Home as HomeIcon, Dashboard as DashboardIcon, Settings as SettingsIcon, Menu as MenuIcon, ExitToApp as ExitToAppIcon } from '@material-ui/icons';
@@ -50,6 +50,12 @@ const useStyles = makeStyles((theme) => ({
 const MySideNav = () => {
   const classes = useStyles();
   const [expanded, setExpanded] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    // Vérifiez si l'utilisateur a le rôle d'administrateur
+    setIsAdmin(kc.hasRealmRole('admin'));
+  }, []);
 
   const toggleDrawerWidth = () => {
     setExpanded(!expanded);
@@ -81,18 +87,22 @@ const MySideNav = () => {
           </ListItemIcon>
           {expanded && <ListItemText primary="Home" />}
         </ListItem>
+        {isAdmin && (
         <ListItem button component={Link} to="/dashboard">
           <ListItemIcon>
             <DashboardIcon />
           </ListItemIcon>
           {expanded && <ListItemText primary="Dashboard" />}
         </ListItem>
-        <ListItem button component={Link} to="/parametres">
-          <ListItemIcon>
-            <SettingsIcon />
-          </ListItemIcon>
-          {expanded && <ListItemText primary="Settings" />}
-        </ListItem>
+        )}
+        {isAdmin && (
+          <ListItem button component={Link} to="/parametres">
+            <ListItemIcon>
+              <SettingsIcon />
+            </ListItemIcon>
+            {expanded && <ListItemText primary="Settings" />}
+          </ListItem>
+        )}
         {/* Ajoutez d'autres éléments de liste pour les routes supplémentaires */}
       </List>
       <Button
@@ -105,8 +115,6 @@ const MySideNav = () => {
         >
         {/* Ne pas inclure de texte ici */}
       </Button>
-
-
     </Drawer>
   );
 };

@@ -58,7 +58,6 @@ const RendezVousDataTable = () => {
           };
           
         });
-        console.log(bookingDetailsArray);
         setData(bookingDetailsArray);
       } catch (error) {
         console.error('Error fetching data:', error.message);
@@ -217,7 +216,7 @@ const RendezVousDataTable = () => {
         try{
           const Ligne = result.value;
           const response = await httpClient.post(`/api/bookings/accepter/${rowData.id}`, {Ligne} );
-          console.log('Réponse de l\'API:', response.data);
+          
           Swal.fire({
             position: "center",
             icon: "success",
@@ -271,7 +270,6 @@ const RendezVousDataTable = () => {
         try {
           // Appel de l'API pour refuser le rendez-vous avec l'id et la raison
           const response = await httpClient.post(`/api/bookings/refuser/${rowData.id}`, {Refus} );
-          console.log('Réponse de l\'API:', response.data);
           Swal.fire({
             position: "center",
             icon: "success",
@@ -313,10 +311,10 @@ const RendezVousDataTable = () => {
       const heureActuelle = new Date();
 
       // Calculer l'heure actuelle moins 15 minutes
-      const heureActuelleMoins15 = new Date(heureActuelle.getTime() - 15 * 60 * 1000); // 15 minutes en millisecondes
+      const heureActuelleMoins15 = new Date(heureActuelle.getTime() - 15 * 60 * 1000).toUTCString; // 15 minutes en millisecondes
 
       // Calculer l'heure actuelle plus 15 minutes
-      const heureActuellePlus15 = new Date(heureActuelle.getTime() + 15 * 60 * 1000); // 15 minutes en millisecondes
+      const heureActuellePlus15 = new Date(heureActuelle.getTime() + 15 * 60 * 1000).toUTCString; // 15 minutes en millisecondes
 
       // Extraire les heures et les minutes de rowData.heure
       const [rowDataHeureHeure, rowDataHeureMinute] = rowData.heure.split(':').map(Number);
