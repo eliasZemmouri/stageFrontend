@@ -20,6 +20,7 @@
     "bootstrap": "^5.3.2",
     "framer-motion": "^4.1.17",
     "jquery": "^3.7.1",
+    "jwt-decode": "^4.0.0",
     "keycloak-js": "^20.0.3",
     "keycloak-react-web": "^0.1.19",
     "location": "^0.0.1",

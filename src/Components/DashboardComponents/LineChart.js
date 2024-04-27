@@ -33,7 +33,7 @@ const LineChartComponent = () => {
         // Calculer le temps dépassé pour chaque tranche horaire
         const data = [];
         const timeRanges = [
-          { name: '8-10h', startTime: 8, endTime: 10 },
+          { name: '7-10h', startTime: 7, endTime: 10 },
           { name: '10-13h', startTime: 10, endTime: 13 },
           { name: '13-15h', startTime: 13, endTime: 15 },
           { name: '15-17h', startTime: 15, endTime: 17 },

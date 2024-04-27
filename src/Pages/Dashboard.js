@@ -42,7 +42,7 @@ const Dashboard = () => {
       { stateName: 'FENETRE', quantity: 0 },
       { stateName: 'ACCEPTE', quantity: 0 },
       { stateName: 'REFUSE', quantity: 0 },
-      { stateName: 'SANS_RENDEZVOUS', quantity: 0 },
+      { stateName: 'SANSRENDEZVOUS', quantity: 0 },
       { stateName: 'NOSHOW', quantity: 0 }
     ];
 

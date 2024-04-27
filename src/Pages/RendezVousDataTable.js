@@ -8,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { httpClient } from '../Api/HttpClient';
 import Swal from 'sweetalert2';
 import monImage from '../images/s-a.png';
+import { kc } from '../Helpers/KeycloakHelper';
 
 const RendezVousDataTable = () => {
   const [data, setData] = useState([]);
@@ -20,8 +21,80 @@ const RendezVousDataTable = () => {
       try {
         if (!selectedST) return;
         const apiUrl = '/api/bookings/details';
-        const response = await httpClient.get(apiUrl + `/${selectedST}`);
-
+        const response = {"data" : [{
+          "bookingDetails": {
+              "id": 280651,
+              "heure": "09:30",
+              "plaque": "1NVN540",
+              "typeDeVisite": "Périodique voiture",
+              "source": "PORTAL",
+              "isid": "10A-240422-0109",
+              "whenCreated": "2024-04-22T10:05:36.674",
+              "whenUpdated": "2024-04-22T10:20:50.096",
+              "status": "FINISHED",
+              "chassis": "VF73DBHXMGJ607279",
+              "vehicule": "C4 PICASSO",
+              "client": "Claude Fayet"
+          },
+          "rendezVousEtat": {
+              "id": "950ee222-391b-435a-8ff1-243537a40de4",
+              "idRendezVous": 280651,
+              "etat": "RETARD",
+              "tempsModification": "2024-04-22T11:05:57.279",
+              "raisonRefus": null,
+              "ligne": null
+          }
+      },
+      {
+          "bookingDetails": {
+              "id": 279818,
+              "heure": "09:45",
+              "plaque": "1WPA442",
+              "typeDeVisite": "Occasion voiture",
+              "source": "PORTAL",
+              "isid": "10A-240422-0104",
+              "whenCreated": "2024-04-22T09:58:33.674",
+              "whenUpdated": "2024-04-22T10:22:51.404",
+              "status": "FINISHED",
+              "chassis": "WVGZZZA1ZKV500998",
+              "vehicule": "T-ROC",
+              "client": "Domenichi Naro"
+          },
+          "rendezVousEtat": {
+              "id": "3c8bea14-deee-47f6-99af-775c5a3b6a53",
+              "idRendezVous": 279818,
+              "etat": "RETARD",
+              "tempsModification": "2024-04-22T11:05:57.28",
+              "raisonRefus": null,
+              "ligne": null
+          }
+      },
+      {
+          "bookingDetails": {
+              "id": 291707,
+              "heure": "09:45",
+              "plaque": "2DLD052",
+              "typeDeVisite": "Périodique camionette",
+              "source": "PORTAL",
+              "isid": "10A-240422-0110",
+              "whenCreated": "2024-04-22T10:05:39.019",
+              "whenUpdated": "2024-04-22T10:37:50.199",
+              "status": "FINISHED",
+              "chassis": "VR3EFYHT2PJ578277",
+              "vehicule": "Partner",
+              "client": "Alves Armindo"
+          },
+          "rendezVousEtat": {
+              "id": "34936ad7-5170-4a32-af0f-4f4dd60dd239",
+              "idRendezVous": 291707,
+              "etat": "SANSRENDEZVOUS",
+              "tempsModification": "2024-04-22T11:05:57.281",
+              "raisonRefus": null,
+              "ligne": null
+          }
+      },]};
+      //const response = await httpClient.get(apiUrl + `/${selectedST}`);
+        console.log(response.data);
         const bookingDetailsArray = response.data.map((item) => {
           const { bookingDetails, rendezVousEtat } = item;
           const jsonString = rendezVousEtat.raisonRefus;
@@ -37,7 +110,7 @@ const RendezVousDataTable = () => {
               deuxiemeValeur = Object.values(jsonObject)[0];
 
             } catch (error) {
-              console.error(error);
+              //console.error(error);
           }
           try {
             // Convertir la chaîne JSON en objet JavaScript
@@ -48,12 +121,12 @@ const RendezVousDataTable = () => {
             deuxiemeValeurA = Object.values(jsonObjectA)[0];
 
           } catch (error) {
-            console.error(error);
+            //console.error(error);
         }
           return {
             ...bookingDetails,
             etat: rendezVousEtat.etat, // Ajoutez la propriété etat
-            raisonRefus: deuxiemeValeur,
+            raisonRefus: deuxiemeValeur || bookingDetails.raison,
             ligne: deuxiemeValeurA,
           };
           
@@ -103,7 +176,7 @@ const RendezVousDataTable = () => {
   };
   const handleAddClick = () => {
     Swal.fire({
-        title: 'Accepter un  sans rendez-vous',
+        title: 'Accepter un rendez-vous sans rendez-vous',
         html:
             '<input id="plaque" class="swal2-input" style="margin-bottom: 30px;" placeholder="Plaque">' +
             '<div style="margin-bottom: 20px;"><input type="radio" id="accordChef" name="accordType" value="accordChef" style="transform: scale(1.5);"><label for="accordChef" style="margin-left: 5px;">Accord Chef</label><input type="radio" id="euemST" name="accordType" value="Mauvaise Station" style="transform: scale(1.5); margin-left: 20px;"><label for="erreurST" style="margin-left: 5px;">Mauvaise Station</label></div>' +
@@ -129,22 +202,48 @@ const RendezVousDataTable = () => {
     }).then((result) => {
         if (result.isConfirmed) {
             const { plaque, choix, accordType } = result.value;
-            // Simulation de l'ajout de rendez-vous
-            setTimeout(() => {
+            // Effectuer la requête POST avec httpClient
+            // Décodage du token JWT sans utiliser jwt_decode
+            
+              console.log(kc.idTokenParsed.preferred_username);
+         
+            httpClient.post('/api/sansRendezVous/create', {
+                plaque: plaque,
+                typeDeVisite: choix,
+                who: kc.idTokenParsed.preferred_username, // Assumant que "who" 
+                raison: accordType
+            }
+          )
+            .then(response => {
+                // Traitement de la réponse si nécessaire
+                console.log('Rendez-vous ajouté:', response.data);
                 Swal.fire({
                     position: 'center',
                     icon: 'success',
                     title: 'Rendez-vous ajouté avec succès!',
                     showConfirmButton: false,
-                    timer: 1500,
-                    didClose: () => {
-                        // Ajoutez ici la logique pour traiter les valeurs entrées après l'animation
-                        console.log('Plaque:', plaque);
-                        console.log('Choix:', choix);
-                        console.log('Accord Type:', accordType);
-                    }
+                    timer: 1500
                 });
-            }, 500); // Délai avant l'affichage de l'animation
+                // Mettre à jour l'état du rendez-vous refusé dans le tableau de données
+                const updatedData = [
+                  ...data,
+                  {
+                      ...response.data,
+                      etat: "SANSRENDEZVOUS",
+                      ligne: "",
+                  }
+              ];
+              console.log("updatetData : ",updatedData );
+              setData(updatedData);
+            })
+            .catch(error => {
+                console.error('Erreur lors de l\'ajout du rendez-vous:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur',
+                    text: 'Une erreur est survenue lors de l\'ajout du rendez-vous.'
+                });
+            });
         }
     });
 };
@@ -172,27 +271,93 @@ const RendezVousDataTable = () => {
     </div>
   );
 
-  const actionButtons = (rowData) => {
-    if (rowData.etat === 'ACCEPTE' || rowData.etat === 'REFUSE') {
-      return (
-        <button className="btn btn-primary" onClick={() => handleRecovery(rowData)}>
-          Récupération
-        </button>
-      );
-    } else {
-      return (
-        <div>
-          <button className="btn btn-success" onClick={() => handleAccept(rowData)}>
-            Valider
-          </button>
-          <span style={{ margin: '0 10px' }}></span> {/* Ajout de l'espace entre les boutons */}
-          <button className="btn btn-danger" onClick={() => handleReject(rowData)}>
-            Refuser
-          </button>
-        </div>
-      );
-    }
+
+
+  const handleModify = (rowData) => {
+    Swal.fire({
+      title: 'Modifier le Sans Rendez-Vous',
+      html:
+        `<input id="newPlaque" class="swal2-input" style="margin-bottom: 10px;" placeholder="Nouvelle Plaque" value="${rowData.plaque}">` +
+        `<select id="newType" class="swal2-select" style="margin-bottom: 10px;">
+          <option value="periodique" ${rowData.typeDeVisite === 'Periodique' ? 'selected' : ''}>Periodique</option>
+          <option value="occasion" ${rowData.typeDeVisite === 'Occasion' ? 'selected' : ''}>Occasion</option>
+          <option value="revisite" ${rowData.typeDeVisite === 'Revisite' ? 'selected' : ''}>Revisite</option>
+        </select>` +
+        `<input id="newRaison" class="swal2-input" placeholder="Nouvelle Raison" value="${rowData.raison || ''}">`,
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: 'Valider',
+      preConfirm: () => {
+        const newPlaque = document.getElementById('newPlaque').value;
+        const newType = document.getElementById('newType').value;
+        const newRaison = document.getElementById('newRaison').value;
+        if (!newPlaque || !newType || !newRaison) {
+          Swal.showValidationMessage('Veuillez remplir tous les champs.');
+          return false;
+        }
+        return { newPlaque, newType, newRaison };
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const { newPlaque, newType, newRaison } = result.value;
+        // Make the API call to update the sans rendez-vous appointment
+        httpClient.post(`/api/sansRendezVous/modification/${rowData.id}/${newPlaque}/${newType}/${newRaison}`)
+          .then(() => {
+            // Update the UI if the API call was successful
+            const updatedData = data.map(item => {
+              if (item.id === rowData.id) {
+                return { ...item, plaque: newPlaque, typeDeVisite: newType, raison: newRaison };
+              }
+              return item;
+            });
+            setData(updatedData);
+            Swal.fire({
+              position: 'center',
+              icon: 'success',
+              title: 'Rendez-vous modifié avec succès!',
+              showConfirmButton: false,
+              timer: 1500
+            });
+          })
+          .catch(error => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Erreur',
+              text: error.message
+            });
+          });
+      }
+    });
   };
+
+const actionButtons = (rowData) => {
+  if (rowData.etat === 'ACCEPTE' || rowData.etat === 'REFUSE') {
+    return (
+      <button className="btn btn-primary" onClick={() => handleRecovery(rowData)}>
+        Récupération
+      </button>
+    );
+  } else if (rowData.etat === 'SANSRENDEZVOUS') {
+    return (
+      <button className="btn btn-warning" onClick={() => handleModify(rowData)}>
+        Modifier
+      </button>
+    );
+  } else {
+    return (
+      <div>
+        <button className="btn btn-success" onClick={() => handleAccept(rowData)}>
+          Valider
+        </button>
+        <span style={{ margin: '0 10px' }}></span> {/* Ajout de l'espace entre les boutons */}
+        <button className="btn btn-danger" onClick={() => handleReject(rowData)}>
+          Refuser
+        </button>
+      </div>
+    );
+  }
+};
+
   
 
   const handleAccept = (rowData) => {
@@ -311,10 +476,10 @@ const RendezVousDataTable = () => {
       const heureActuelle = new Date();
 
       // Calculer l'heure actuelle moins 15 minutes
-      const heureActuelleMoins15 = new Date(heureActuelle.getTime() - 15 * 60 * 1000).toUTCString; // 15 minutes en millisecondes
+      const heureActuelleMoins30 = new Date(heureActuelle.getTime() - 30 * 60 * 1000); // 15 minutes en millisecondes
 
       // Calculer l'heure actuelle plus 15 minutes
-      const heureActuellePlus15 = new Date(heureActuelle.getTime() + 15 * 60 * 1000).toUTCString; // 15 minutes en millisecondes
+      const heureActuellePlus30 = new Date(heureActuelle.getTime() + 30 * 60 * 1000); // 15 minutes en millisecondes
 
       // Extraire les heures et les minutes de rowData.heure
       const [rowDataHeureHeure, rowDataHeureMinute] = rowData.heure.split(':').map(Number);
@@ -325,16 +490,15 @@ const RendezVousDataTable = () => {
       rowDataDate.setMinutes(rowDataHeureMinute);
 
       // Vérifier si rowData.heure est dans l'intervalle de 15 minutes autour de l'heure actuelle
-      if (rowDataDate > heureActuelleMoins15 && rowDataDate < heureActuellePlus15) {
+      if (rowDataDate > heureActuelleMoins30 && rowDataDate < heureActuellePlus30) {
           et= "A VENIR";
-      } else if (rowDataDate < heureActuelleMoins15) {
+      } else if (rowDataDate < heureActuelleMoins30) {
           et= "RETARD";
-      } else if (rowDataDate > heureActuellePlus15) {
+      } else if (rowDataDate > heureActuellePlus30) {
           et= "AVANCE"
       } else {
           et= "A VENIR";
       }
-
       const response = await httpClient.post(`/api/bookings/recuperer/${rowData.id}/${et}`);
       
       // Affichez un message de succès si l'appel à l'API réussit
@@ -449,14 +613,14 @@ const RendezVousDataTable = () => {
                 >
                   <Column field="heure" header="Heure" style={{ width: '5%' }} />
                   <Column field="id" header="RDV" style={{ width: '3%' }} />
+                  <Column field="typeDeVisite" header="Type de Visite" style={{ width: '10%' }} />
                   <Column field="plaque" header="Plaque" style={{ width: '8%' }} />
                   <Column field="chassis" header="Chassis" style={{ width: '5%' }} />
-                  <Column field="source" header="Source" style={{ width: '6%' }} />
+                  <Column field="vehicule" header="Véhicule" style={{ width: '15%' }} />
                   <Column field="client" header="Client" style={{ width: '15%' }} />
-                  <Column field="typeDeVisite" header="Type de Visite" style={{ width: '10%' }} />
+                  <Column field="source" header="Source" style={{ width: '6%' }} />
                   <Column field="ligne" header="Ligne" style={{ width: '2%' }} />
                   <Column field="raisonRefus" header="Raison" style={{ width: '5%' }} />
-                  <Column field="vehicule" header="Véhicule" style={{ width: '15%' }} />
                   <Column body={actionButtons} header="Actions" style={{ width: '23%' }} />
                 </DataTable>
               </div>
