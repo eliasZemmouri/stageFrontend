@@ -15,9 +15,25 @@ const RendezVousDataTable = () => {
   const [selectedState, setSelectedState] = useState('A venir');
   const [globalFilter, setGlobalFilter] = useState('');
   const [selectedST, setSelectedST] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [reload, setReload] = useState(false);
+  const [droitAction, setDroitAction] = useState(true);
+
+  const formattedLastUpdate = () => {
+    const now = new Date();
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+    return now.toLocaleDateString('fr-FR', options);
+  };
+
+  const [lastUpdate, setLastUpdate] = useState(formattedLastUpdate());
 
   useEffect(() => {
+    
     const fetchData = async () => {
+      setDroitAction(true);
+      console.log(loading);
+      setLoading(true);
+      console.log(loading);
       try {
         if (!selectedST) return;
         const apiUrl = '/api/bookings/details';
@@ -39,7 +55,7 @@ const RendezVousDataTable = () => {
           "rendezVousEtat": {
               "id": "950ee222-391b-435a-8ff1-243537a40de4",
               "idRendezVous": 280651,
-              "etat": "RETARD",
+              "etat": "A VENIR",
               "tempsModification": "2024-04-22T11:05:57.279",
               "raisonRefus": null,
               "ligne": null
@@ -93,6 +109,7 @@ const RendezVousDataTable = () => {
               "ligne": null
           }
       },]};
+      console.log(loading);
       //const response = await httpClient.get(apiUrl + `/${selectedST}`);
         console.log(response.data);
         const bookingDetailsArray = response.data.map((item) => {
@@ -132,13 +149,30 @@ const RendezVousDataTable = () => {
           
         });
         setData(bookingDetailsArray);
+        setLoading(false);
       } catch (error) {
+        setLoading(false);
         console.error('Error fetching data:', error.message);
       }
     };
 
     fetchData();
-  }, [selectedST]);
+    // Exécute fetchData toutes les 15 minutes
+    const intervalId = setInterval(fetchData, 2 * 60 * 1000);
+    
+    // Ajouter une alerte si le chargement prend trop de temps (par exemple, moins d'une minute)
+    const timeoutId = setTimeout(() => {
+      
+          // modifier les droits aux actions s'il reste que 1 minute
+          setDroitAction(false);
+    }, (1 * 60 * 1000)); // Déclencher l'alerte lorsque la 14ème minute est atteinte
+
+  
+    // Nettoyer l'intervalle lors du démontage du composant
+    return () => clearInterval(intervalId);
+  }, [selectedST,reload]);
+
+  
 
   const handleSTSelect = (st) => {
     setSelectedST(st);
@@ -172,9 +206,18 @@ const RendezVousDataTable = () => {
   };
 
   const handleRefreshClick = () => {
-    window.location.reload();
+    setReload(!reload);
+    setLastUpdate(formattedLastUpdate());
   };
+  //alerte affiché si le refresh est a faire
+  const alertReload = ()=> {
+    Swal.fire("il faut reload");
+  }
   const handleAddClick = () => {
+    if(!droitAction){
+      alertReload();
+      return;
+    }
     Swal.fire({
         title: 'Accepter un rendez-vous sans rendez-vous',
         html:
@@ -274,6 +317,10 @@ const RendezVousDataTable = () => {
 
 
   const handleModify = (rowData) => {
+    if(!droitAction){
+      alertReload();
+      return;
+    }
     Swal.fire({
       title: 'Modifier le Sans Rendez-Vous',
       html:
@@ -361,6 +408,10 @@ const actionButtons = (rowData) => {
   
 
   const handleAccept = (rowData) => {
+    if(!droitAction){
+      alertReload();
+      return;
+    }
     Swal.fire({
       title: 'Accepter la réservation',
       text: 'Veuillez sélectionner une Ligne:',
@@ -411,6 +462,10 @@ const actionButtons = (rowData) => {
   };
 
   const handleReject =async (rowData) => {
+    if(!droitAction){
+      alertReload();
+      return;
+    }
     
     Swal.fire({
       title: 'Refuser la réservation',
@@ -466,6 +521,10 @@ const actionButtons = (rowData) => {
   }; 
 
   const handleRecovery = async (rowData) => {
+    if(!droitAction){
+      alertReload();
+      return;
+    }
     try {
       // Effectuez ici l'appel à l'API pour gérer la récupération du rendez-vous
       // Par exemple, vous pouvez appeler votre endpoint API avec l'ID du rendez-vous
@@ -527,15 +586,12 @@ const actionButtons = (rowData) => {
   };
   
 
-  const formattedLastUpdate = () => {
-    const now = new Date();
-    const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-    return now.toLocaleDateString('fr-FR', options);
-  };
+  
   
 
   return (
     <div>
+      
       {!selectedST && (
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
           <h3>Choisissez une option :</h3>
@@ -555,7 +611,7 @@ const actionButtons = (rowData) => {
             <img src={monImage} style={{ maxWidth: '100%', height: 'auto', width: '250px' }} />
             <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
               <div style={{ textAlign: 'center', flex: 1 }}>
-                <p style={{ whiteSpace: 'nowrap', marginTop: '10px', marginLeft: 'auto', marginRight: 'auto' }}>Dernière Maj : {formattedLastUpdate()}</p>
+                <p style={{ whiteSpace: 'nowrap', marginTop: '10px', marginLeft: 'auto', marginRight: 'auto' }}>Dernière Maj : {lastUpdate}</p>
               </div>
               <button
                 className="fa fa-fw fa-plus"
@@ -603,6 +659,7 @@ const actionButtons = (rowData) => {
                       return row.etat === selectedState.toUpperCase();
                     }
                   })}
+                  loading = {loading}
                   stripedRows
                   className="p-datatable-striped"
                   scrollable
