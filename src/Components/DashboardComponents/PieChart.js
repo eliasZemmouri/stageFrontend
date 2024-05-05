@@ -5,24 +5,19 @@ import { httpClient } from '../../Api/HttpClient';
 const Example = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedOption, setSelectedOption] = useState(localStorage.getItem('selectedOption') || 'aujourd\'hui');
+  const [dateRange, setDateRange] = useState(JSON.parse(localStorage.getItem('dateRange')) || { startDate: new Date(), endDate: new Date() });
   const [selectedStation, setSelectedStation] = useState(localStorage.getItem('selectedSTOption') || 'ST10');
   const [retardData, setRetardData] = useState([]);
   const [attenteData, setAttenteData] = useState([]);
 
-  useEffect(() => {
-    const storedSelectedOption = localStorage.getItem('selectedOption');
-    const storedSelectedStation = localStorage.getItem('selectedSTOption');
-    setSelectedOption(storedSelectedOption || 'aujourd\'hui');
-    setSelectedStation(storedSelectedStation || 'ST10');
-  }, []);
   
+
   useEffect(() => {
     const defaultStates = [
       { stateName: 'FENETRE', quantity: 0 },
       { stateName: 'ACCEPTE', quantity: 0 },
       { stateName: 'REFUSE', quantity: 0 },
-      { stateName: 'SANS_RENDEZVOUS', quantity: 0 },
+      { stateName: 'SANSRENDEZVOUS', quantity: 0 },
       { stateName: 'NOSHOW', quantity: 0 }
     ];
     setData(defaultStates);
@@ -32,7 +27,23 @@ const Example = () => {
         setLoading(true);
         let apiUrl;
         
-        apiUrl = `/api/bookings/details/${selectedStation}`;
+        const debut = new Date(dateRange.startDate); // Utilise la date sélectionnée par l'utilisateur
+        debut.setHours(5); // Définit l'heure choisie
+        debut.setMinutes(45); // Définit les minutes choisies
+        debut.setSeconds(0); // Définit les secondes à zéro
+        debut.setMilliseconds(0); // Définit les millisecondes à zéro
+
+        // Fin de la plage horaire
+        const fin = new Date(dateRange.endDate); // Utilise la date sélectionnée par l'utilisateur
+        fin.setHours(19); // Définit l'heure choisie
+        fin.setMinutes(19); // Définit les minutes choisies
+        fin.setSeconds(0); // Définit les secondes à zéro
+        fin.setMilliseconds(0); // Définit les millisecondes à zéro
+
+        // Convertit les dates au format ISO 8601 pour les inclure dans l'URL
+        const debutISO = debut.toISOString();
+        const finISO = fin.toISOString();
+        apiUrl = `/api/bookings/details/${selectedStation}/${debutISO}/${finISO}`;
 
         const response = await httpClient.get(apiUrl);
         const fetchedData = response.data;
@@ -72,9 +83,9 @@ const Example = () => {
             // Calcul pour le temps après la présentation
             if (item.rendezVousEtat.etat === 'ACCEPTE') {
               const attente = item.rendezVousEtat.attente;
-              if (attente <= 15) {
+              if (attente < 15) {
                 attentes['<15']++;
-              } else if (attente <= 30) {
+              } else if (attente < 30) {
                 attentes['<30']++;
               } else {
                 attentes['>30']++;
@@ -108,7 +119,7 @@ const Example = () => {
     };
 
     fetchData();
-  }, [selectedOption, selectedStation]);
+  }, [selectedStation]);
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#42ff65', '#ff42d6'];
 

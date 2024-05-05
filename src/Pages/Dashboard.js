@@ -76,7 +76,7 @@ const Dashboard = () => {
         setDataTransfer(response.data);
 
         const stateQuantities = {};
-        const totalRendezvousWithoutCancelledV = data.reduce((acc, item) => {
+        const totalRendezvousWithoutCancelledV =await data.reduce((acc, item) => {
           if (item.rendezVousEtat.etat !== 'ANNULE') {
             let stateName;
             if(item.rendezVousEtat.etat === 'A VENIR' || item.rendezVousEtat.etat === 'AVANCE' || item.rendezVousEtat.etat === 'RETARD'){

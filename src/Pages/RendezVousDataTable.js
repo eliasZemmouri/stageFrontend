@@ -15,9 +15,12 @@ const RendezVousDataTable = () => {
   const [selectedState, setSelectedState] = useState('A venir');
   const [globalFilter, setGlobalFilter] = useState('');
   const [selectedST, setSelectedST] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [reload, setReload] = useState(false);
   const [droitAction, setDroitAction] = useState(true);
+  const [timeout,  setTimeoutId] = useState(true);
+  const [dateRange, setDateRange] = useState(JSON.parse(localStorage.getItem('dateRange')) || { startDate: new Date(), endDate: new Date() });
+
 
   const formattedLastUpdate = () => {
     const now = new Date();
@@ -29,15 +32,20 @@ const RendezVousDataTable = () => {
 
   useEffect(() => {
     
-    const fetchData = async () => {
+    const l=()=>{
       setDroitAction(true);
+    }
+    l();
+    console.log("loading : "+loading);
+    const fetchData = async () => {
+      //setDroitAction(true);
+      
       console.log(loading);
-      setLoading(true);
-      console.log(loading);
+      console.log("ici")
       try {
         if (!selectedST) return;
-        const apiUrl = '/api/bookings/details';
-        const response = {"data" : [{
+        //const apiUrl = '/api/bookings/details';
+        /*const response = {"data" : [{
           "bookingDetails": {
               "id": 280651,
               "heure": "09:30",
@@ -108,11 +116,31 @@ const RendezVousDataTable = () => {
               "raisonRefus": null,
               "ligne": null
           }
-      },]};
+      },]};*/
       console.log(loading);
-      //const response = await httpClient.get(apiUrl + `/${selectedST}`);
+      /*const debut = new Date(dateRange.startDate); // Utilise la date sélectionnée par l'utilisateur
+        debut.setHours(5); // Définit l'heure choisie
+        debut.setMinutes(45); // Définit les minutes choisies
+        debut.setSeconds(0); // Définit les secondes à zéro
+        debut.setMilliseconds(0); // Définit les millisecondes à zéro
+
+        // Fin de la plage horaire
+        const fin = new Date(dateRange.endDate); // Utilise la date sélectionnée par l'utilisateur
+        fin.setHours(19); // Définit l'heure choisie
+        fin.setMinutes(19); // Définit les minutes choisies
+        fin.setSeconds(0); // Définit les secondes à zéro
+        fin.setMilliseconds(0); // Définit les millisecondes à zéro
+
+        // Convertit les dates au format ISO 8601 pour les inclure dans l'URL
+        const debutISO = debut.toISOString();
+        const finISO = fin.toISOString();
+        const apiUrl = `/api/bookings/details/${selectedST}/${debutISO}/${finISO}`;
+        pour tests local
+        */ 
+        const apiUrl = `/api/bookings/details/${selectedST}`;
+        const response = await httpClient.get(apiUrl);
         console.log(response.data);
-        const bookingDetailsArray = response.data.map((item) => {
+        const bookingDetailsArray = await response.data.map((item) => {
           const { bookingDetails, rendezVousEtat } = item;
           const jsonString = rendezVousEtat.raisonRefus;
           const jsonStringA = rendezVousEtat.ligne;
@@ -143,34 +171,46 @@ const RendezVousDataTable = () => {
           return {
             ...bookingDetails,
             etat: rendezVousEtat.etat, // Ajoutez la propriété etat
-            raisonRefus: deuxiemeValeur || bookingDetails.raison,
-            ligne: deuxiemeValeurA,
+            raisonRefus: bookingDetails.raison || deuxiemeValeur ,
+            ligne: deuxiemeValeurA || rendezVousEtat.ligne,
           };
           
         });
         setData(bookingDetailsArray);
-        setLoading(false);
       } catch (error) {
-        setLoading(false);
+        
         console.error('Error fetching data:', error.message);
       }
     };
 
     fetchData();
-    // Exécute fetchData toutes les 15 minutes
-    const intervalId = setInterval(fetchData, 2 * 60 * 1000);
-    
+    const e=()=>{
+      setLoading(false);
+    }
+    //e();
+    console.log(loading);
     // Ajouter une alerte si le chargement prend trop de temps (par exemple, moins d'une minute)
-    const timeoutId = setTimeout(() => {
-      
-          // modifier les droits aux actions s'il reste que 1 minute
-          setDroitAction(false);
-    }, (1 * 60 * 1000)); // Déclencher l'alerte lorsque la 14ème minute est atteinte
-
+    setTimeout(() => {
+      console.log("Décompte terminé !");
+      // modifier les droits aux actions s'il reste que 1 minute
+      const l=()=>{
+        setDroitAction(false);
+      }
+      l();
+    }, (14 * 60 * 1000)); // Déclencher l'alerte lorsque la 14ème minute est atteinte
+    setTimeout(() => {
+      console.log("Décompte2 terminé !");
+      // modifier les droits aux actions s'il reste que 1 minute
+      const l=()=>{
+        setDroitAction(true);
+      //setLoading(true);
+      setTimeoutId(!timeout);
+      }
+      l();
+    }, (15 * 60 * 1000)); // Déclencher l'alerte lorsque la 14ème minute est atteinte
   
-    // Nettoyer l'intervalle lors du démontage du composant
-    return () => clearInterval(intervalId);
-  }, [selectedST,reload]);
+   
+  }, [selectedST,reload,timeout]);
 
   
 
@@ -198,7 +238,6 @@ const RendezVousDataTable = () => {
     { label: 'Refusé', value: 'Refusé' },
     { label: 'Sans Rendez-Vous', value: 'SansRendezVous' }, // Ajout de l'état pour les sans rendez-vous
 
-    // Ajoutez d'autres états selon vos besoins
   ];
 
   const handleGlobalFilterChange = (e) => {
@@ -208,26 +247,55 @@ const RendezVousDataTable = () => {
   const handleRefreshClick = () => {
     setReload(!reload);
     setLastUpdate(formattedLastUpdate());
+    //setLoading(true);
+
   };
   //alerte affiché si le refresh est a faire
   const alertReload = ()=> {
-    Swal.fire("il faut reload");
+    Swal.fire("Veuillez d'abord  actualiser la page");
   }
+
+  const [typeDeVisiteOptions, setTypeDeVisiteOptions] = useState([]); // État pour stocker les options de type de visite
+  const [modalOpened, setModalOpened] = useState(false);
+
+  // Fonction pour récupérer les options de type de visite depuis le backend
+  const fetchTypeDeVisiteOptions = async () => {
+    try {
+      const response = await httpClient.get('/api/bookings/allTypeOfVisite');
+      setTypeDeVisiteOptions(response.data);
+      //console.log("Options de type de visite récupérées avec succès:", response.data);
+      setModalOpened(true); // Ouvrir la fenêtre modale Swal une fois que les données sont récupérées
+    } catch (error) {
+      console.error('Erreur lors de la récupération des options de type de visite:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTypeDeVisiteOptions(); // Appel de la fonction pour récupérer les options de type de visite lors du montage du composant
+  }, []);
+
   const handleAddClick = () => {
     if(!droitAction){
       alertReload();
       return;
     }
+
+    if (!modalOpened) {
+      // Attendre que les options de type de visite soient disponibles avant d'ouvrir la fenêtre modale Swal
+      Swal.fire("Les options de type de visite ne sont pas encore disponibles. Réessayez...");
+      return;
+    }
+
+    
     Swal.fire({
         title: 'Accepter un rendez-vous sans rendez-vous',
         html:
-            '<input id="plaque" class="swal2-input" style="margin-bottom: 30px;" placeholder="Plaque">' +
-            '<div style="margin-bottom: 20px;"><input type="radio" id="accordChef" name="accordType" value="accordChef" style="transform: scale(1.5);"><label for="accordChef" style="margin-left: 5px;">Accord Chef</label><input type="radio" id="euemST" name="accordType" value="Mauvaise Station" style="transform: scale(1.5); margin-left: 20px;"><label for="erreurST" style="margin-left: 5px;">Mauvaise Station</label></div>' +
-            '<select id="choix" class="swal2-select">' +
-            '<option value="periodique">Periodique</option>' +
-            '<option value="occasion">Occasion</option>' +
-            '<option value="revisite">Revisite</option>' +
-            '</select>',
+            '<input id="plaque" class="swal2-input" style="margin-bottom: 10px;" placeholder="Plaque">' +
+            '<div style="margin-bottom: 20px;"><input type="radio" id="accordChef" name="accordType" value="accordChef" style="transform: scale(1.5);"><label for="accordChef" style="margin-left: 5px;">Accord Chef</label><input type="radio" id="erreurST" name="accordType" value="erreurST" style="transform: scale(1.5); margin-left: 20px;"><label for="erreurST" style="margin-left: 5px;">Mauvaise Station</label></div>' +
+            `<select id="choix" class="swal2-select" style="margin-bottom: 10px;">
+              ${typeDeVisiteOptions.map(option => `<option value="${option}">${option}</option>`).join('')}
+            </select>` +
+            '<div style="margin-bottom: 10px;"><input type="radio" id="ligne1" name="ligne" value="1" style="transform: scale(1.5);"><label for="ligne1" style="margin-left: 5px;">Ligne 1</label><input type="radio" id="ligne2" name="ligne" value="2" style="transform: scale(1.5); margin-left: 20px;"><label for="ligne2" style="margin-left: 5px;">Ligne 2</label><input type="radio" id="ligne3" name="ligne" value="3" style="transform: scale(1.5); margin-left: 20px;"><label for="ligne3" style="margin-left: 5px;">Ligne 3</label><input type="radio" id="ligne3" name="ligne" value="4" style="transform: scale(1.5); margin-left: 20px;"><label for="ligne4" style="margin-left: 5px;">Ligne 4</label><input type="radio" id="ligne3" name="ligne" value="5" style="transform: scale(1.5); margin-left: 20px;"><label for="ligne5" style="margin-left: 5px;">Ligne 5</label></div>',
         focusConfirm: false,
         showCancelButton: true,
         confirmButtonText: 'Ajouter',
@@ -236,29 +304,25 @@ const RendezVousDataTable = () => {
             const choix = document.getElementById('choix').value;
             const accordTypeElement = document.querySelector('input[name="accordType"]:checked');
             const accordType = accordTypeElement ? accordTypeElement.value : null;
-            if (!plaque || !choix || !accordType) {
+            const ligneElement = document.querySelector('input[name="ligne"]:checked');
+            const ligne = ligneElement ? ligneElement.value : null;
+            if (!plaque || !choix || !accordType || !ligne) {
                 Swal.showValidationMessage('Veuillez remplir tous les champs.');
                 return false;
             }
-            return { plaque, choix, accordType };
+            return { plaque, choix, accordType, ligne };
         }
     }).then((result) => {
         if (result.isConfirmed) {
-            const { plaque, choix, accordType } = result.value;
-            // Effectuer la requête POST avec httpClient
-            // Décodage du token JWT sans utiliser jwt_decode
-            
-              console.log(kc.idTokenParsed.preferred_username);
-         
+            const { plaque, choix, accordType, ligne } = result.value;
+            console.log(kc.idTokenParsed.preferred_username);
             httpClient.post('/api/sansRendezVous/create', {
                 plaque: plaque,
                 typeDeVisite: choix,
-                who: kc.idTokenParsed.preferred_username, // Assumant que "who" 
-                raison: accordType
-            }
-          )
-            .then(response => {
-                // Traitement de la réponse si nécessaire
+                who: kc.idTokenParsed.preferred_username,
+                raison: accordType,
+                ligne: ligne
+            }).then(response => {
                 console.log('Rendez-vous ajouté:', response.data);
                 Swal.fire({
                     position: 'center',
@@ -267,19 +331,18 @@ const RendezVousDataTable = () => {
                     showConfirmButton: false,
                     timer: 1500
                 });
-                // Mettre à jour l'état du rendez-vous refusé dans le tableau de données
                 const updatedData = [
-                  ...data,
-                  {
-                      ...response.data,
-                      etat: "SANSRENDEZVOUS",
-                      ligne: "",
-                  }
-              ];
-              console.log("updatetData : ",updatedData );
-              setData(updatedData);
-            })
-            .catch(error => {
+                    ...data,
+                    {
+                        ...response.data,
+                        etat: "SANSRENDEZVOUS",
+                        ligne: ligne,
+                        raisonRefus: response.data.raison
+                    }
+                ];
+                console.log("updatetData : ",updatedData );
+                setData(updatedData);
+            }).catch(error => {
                 console.error('Erreur lors de l\'ajout du rendez-vous:', error);
                 Swal.fire({
                     icon: 'error',
@@ -290,6 +353,7 @@ const RendezVousDataTable = () => {
         }
     });
 };
+
 
 
 
@@ -310,7 +374,7 @@ const RendezVousDataTable = () => {
   const globalFilterElement = (
     <div className="table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <div style={{ marginLeft: '25px', display: 'flex' }}>{stateButtons}</div>
-      <input type="text" placeholder="Global Search" value={globalFilter} onChange={handleGlobalFilterChange} />
+      <input type="text" placeholder="Recherche globale" value={globalFilter} onChange={handleGlobalFilterChange} />
     </div>
   );
 
@@ -321,39 +385,47 @@ const RendezVousDataTable = () => {
       alertReload();
       return;
     }
+    if (!modalOpened) {
+      // Attendre que les options de type de visite soient disponibles avant d'ouvrir la fenêtre modale Swal
+      Swal.fire("Les options de type de visite ne sont pas encore disponibles. Réessayez...");
+      return;
+    }
     Swal.fire({
       title: 'Modifier le Sans Rendez-Vous',
       html:
         `<input id="newPlaque" class="swal2-input" style="margin-bottom: 10px;" placeholder="Nouvelle Plaque" value="${rowData.plaque}">` +
         `<select id="newType" class="swal2-select" style="margin-bottom: 10px;">
-          <option value="periodique" ${rowData.typeDeVisite === 'Periodique' ? 'selected' : ''}>Periodique</option>
-          <option value="occasion" ${rowData.typeDeVisite === 'Occasion' ? 'selected' : ''}>Occasion</option>
-          <option value="revisite" ${rowData.typeDeVisite === 'Revisite' ? 'selected' : ''}>Revisite</option>
+          ${typeDeVisiteOptions.map(option => `<option value="${option}" ${rowData.typeDeVisite === option ? 'selected' : ''}>${option}</option>`).join('')}
         </select>` +
-        `<input id="newRaison" class="swal2-input" placeholder="Nouvelle Raison" value="${rowData.raison || ''}">`,
+        `<div style="margin-bottom: 20px;"><input type="radio" id="newAccordChef" name="newAccordType" value="accordChef" style="transform: scale(1.5);" ${rowData.raisonRefus === 'accordChef' ? 'checked' : ''}><label for="newAccordChef" style="margin-left: 5px;">Accord Chef</label><input type="radio" id="newErreurST" name="newAccordType" value="erreurST" style="transform: scale(1.5); margin-left: 20px;" ${rowData.raisonRefus === 'erreurST' ? 'checked' : ''}><label for="newErreurST" style="margin-left: 5px;">Mauvaise Station</label></div>` +
+            `<div style="margin-bottom: 10px;"><input type="radio" id="newLigne1" name="newLigne" value="1" style="transform: scale(1.5);" ${rowData.ligne === '1' ? 'checked' : ''}><label for="newLigne1" style="margin-left: 5px;">Ligne 1</label><input type="radio" id="newLigne2" name="newLigne" value="2" style="transform: scale(1.5); margin-left: 20px;" ${rowData.ligne === '2' ? 'checked' : ''}><label for="newLigne2" style="margin-left: 5px;">Ligne 2</label><input type="radio" id="newLigne3" name="newLigne" value="3" style="transform: scale(1.5); margin-left: 20px;" ${rowData.ligne === '3' ? 'checked' : ''}><label for="newLigne3" style="margin-left: 5px;">Ligne 3</label><input type="radio" id="newLigne4" name="newLigne" value="4" style="transform: scale(1.5); margin-left: 20px;" ${rowData.ligne === '4' ? 'checked' : ''}><label for="newLigne4" style="margin-left: 5px;">Ligne 4</label><input type="radio" id="newLigne5" name="newLigne" value="5" style="transform: scale(1.5); margin-left: 20px;" ${rowData.ligne === '5' ? 'checked' : ''}><label for="newLigne5" style="margin-left: 5px;">Ligne 5</label></div>`,
       focusConfirm: false,
       showCancelButton: true,
       confirmButtonText: 'Valider',
       preConfirm: () => {
         const newPlaque = document.getElementById('newPlaque').value;
         const newType = document.getElementById('newType').value;
-        const newRaison = document.getElementById('newRaison').value;
-        if (!newPlaque || !newType || !newRaison) {
+        const newAccordTypeElement = document.querySelector('input[name="newAccordType"]:checked');
+        const newAccordType = newAccordTypeElement ? newAccordTypeElement.value : null;
+        const newRaison = newAccordType;
+        const newLigneElement = document.querySelector('input[name="newLigne"]:checked');
+            const newLigne = newLigneElement ? newLigneElement.value : null;
+        if (!newPlaque || !newType || !newRaison || !newLigne) {
           Swal.showValidationMessage('Veuillez remplir tous les champs.');
           return false;
         }
-        return { newPlaque, newType, newRaison };
+        return { newPlaque, newType, newRaison, newLigne };
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        const { newPlaque, newType, newRaison } = result.value;
+        const { newPlaque, newType, newRaison, newLigne } = result.value;
         // Make the API call to update the sans rendez-vous appointment
-        httpClient.post(`/api/sansRendezVous/modification/${rowData.id}/${newPlaque}/${newType}/${newRaison}`)
+        httpClient.post(`/api/sansRendezVous/modification/${rowData.id}/${newPlaque}/${newType}/${newRaison}/${newLigne}`)
           .then(() => {
             // Update the UI if the API call was successful
             const updatedData = data.map(item => {
               if (item.id === rowData.id) {
-                return { ...item, plaque: newPlaque, typeDeVisite: newType, raison: newRaison };
+                return { ...item, plaque: newPlaque, typeDeVisite: newType, raisonRefus: newRaison,  ligne: newLigne };
               }
               return item;
             });
@@ -417,9 +489,11 @@ const actionButtons = (rowData) => {
       text: 'Veuillez sélectionner une Ligne:',
       input: 'radio',
       inputOptions: {
-        'Ligne 1': 'L1',
-        'Ligne 2': 'L2',
-        'Ligne 3': 'L3'
+        '1': 'L1',
+        '2': 'L2',
+        '3': 'L3',
+        '4': 'L4',
+        '5': 'L5'
       },
       inputValidator: (value) => {
         if (!value) {
@@ -572,7 +646,7 @@ const actionButtons = (rowData) => {
       // Mettre à jour l'état du rendez-vous refusé dans le tableau de données
       const updatedData = data.map(item => {
         if (item.id === rowData.id) {
-          return { ...item, etat: et };
+          return { ...item, etat: et, raisonRefus:null, ligne:null };
         }
         return item;
       });
@@ -585,9 +659,22 @@ const actionButtons = (rowData) => {
     }
   };
   
+  //le max pour zommer la table
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth >= 2100);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth >= 2100);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
   
-  
+//console.log("taiille : "+window.innerWidth);
 
   return (
     <div>
@@ -647,18 +734,19 @@ const actionButtons = (rowData) => {
           
             <div className="container-fluid mt-4 main-container" >
               <div className="custom-table-container">
-                <DataTable
+                <DataTable 
                   value={data.filter(row => {
                     if (selectedState === 'Refusé') {
                       return row.etat === 'REFUSE';
                     }else if(selectedState === 'Validé'){
                       return row.etat === 'ACCEPTE';
                     }else if (selectedState === 'Sans Rendez-Vous') { // Filtre pour les rendez-vous sans rendez-vous
-                      return row.etat === 'SansRendezVous';
+                      return row.etat === 'SANSRENDEZVOUS';
                     } else {
                       return row.etat === selectedState.toUpperCase();
                     }
                   })}
+                  tableStyle = {{ zoom: isSmallScreen ? '0.5' : '1' }}
                   loading = {loading}
                   stripedRows
                   className="p-datatable-striped"
@@ -668,17 +756,17 @@ const actionButtons = (rowData) => {
                   header={globalFilterElement}
                   emptyMessage="Aucun rendez-vous trouvé."
                 >
-                  <Column field="heure" header="Heure" style={{ width: '5%' }} />
-                  <Column field="id" header="RDV" style={{ width: '3%' }} />
-                  <Column field="typeDeVisite" header="Type de Visite" style={{ width: '10%' }} />
-                  <Column field="plaque" header="Plaque" style={{ width: '8%' }} />
-                  <Column field="chassis" header="Chassis" style={{ width: '5%' }} />
-                  <Column field="vehicule" header="Véhicule" style={{ width: '15%' }} />
-                  <Column field="client" header="Client" style={{ width: '15%' }} />
-                  <Column field="source" header="Source" style={{ width: '6%' }} />
-                  <Column field="ligne" header="Ligne" style={{ width: '2%' }} />
-                  <Column field="raisonRefus" header="Raison" style={{ width: '5%' }} />
-                  <Column body={actionButtons} header="Actions" style={{ width: '23%' }} />
+                  <Column field="heure" header="Heure" style={{ width: '5%' }} body={rowData => rowData.heure || '-'} />
+                  <Column field="id" header="RDV" style={{ width: '3%' }} body={rowData => rowData.id || '-'} />
+                  <Column field="typeDeVisite" header="Type de Visite" style={{ width: '10%' }} body={rowData => rowData.typeDeVisite || '-'} />
+                  <Column field="plaque" header="Plaque" style={{ width: '8%' }} body={rowData => rowData.plaque || '-'} />
+                  <Column field="chassis" header="Chassis" style={{ width: '5%' }} body={rowData => rowData.chassis || '-'} />
+                  <Column field="vehicule" header="Véhicule" style={{ width: '15%' }} body={rowData => rowData.vehicule || '-'} />
+                  <Column field="client" header="Client" style={{ width: '15%' }} body={rowData => rowData.client || '-'} />
+                  <Column field="source" header="Source" style={{ width: '6%' }} body={rowData => rowData.source || '-'} />
+                  <Column field="ligne" header="Ligne" style={{ width: '2%' }} body={rowData => rowData.ligne || '-'} />
+                  <Column field="raisonRefus" header="Raison" style={{ width: '5%' }} body={rowData => rowData.raisonRefus || '-'} />
+                  <Column field="actions" header="Actions" style={{ width: '23%' }} body={actionButtons} />
                 </DataTable>
               </div>
             </div>

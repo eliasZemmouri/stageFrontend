@@ -1,51 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import monImage from '../images/s-a.png';
 import './ParametresPage.css';
 import Swal from 'sweetalert2';
+import { httpClient } from '../Api/HttpClient';
 
 const SettingsPage = () => {
-  const [retardValues, setRetardValues] = useState([0, 0, 0]);
-  const [tempsAttenteValues, setTempsAttenteValues] = useState([0, 0, 0]);
+  const [configurations, setConfigurations] = useState([]);
 
-  const handleInputChange = (section, index, value) => {
-    if (section === 'retard') {
-      const newValues = [...retardValues];
-      newValues[index] = value;
-      // Make sure the last "plus petit que" is greater than or equal to the previous one
-      if (index > 0 && newValues[index] < newValues[index - 1]) {
-        newValues[index] = newValues[index - 1];
-      }
-      setRetardValues(newValues);
-    } else if (section === 'tempsAttente') {
-      const newValues = [...tempsAttenteValues];
-      newValues[index] = value;
-      // Make sure the last "plus petit que" is greater than or equal to the previous one
-      if (index > 0 && newValues[index] < newValues[index - 1]) {
-        newValues[index] = newValues[index - 1];
-      }
-      setTempsAttenteValues(newValues);
-    }
+  useEffect(() => {
+    // Effectue une requête GET pour récupérer la liste des configurations lors du chargement du composant
+    fetchConfigurations();
+  }, []);
+
+  const fetchConfigurations = () => {
+    // Effectue une requête GET pour récupérer la liste des configurations depuis votre backend
+    httpClient.get('/api/configurations')
+      .then(response => {
+        // Met à jour le state avec les données récupérées
+        setConfigurations(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching configurations:', error);
+      });
   };
 
-  const handleSaveClick = (chartIndex) => {
-    // Logique de sauvegarde ici
-    console.log(`Données du tableau ${chartIndex} enregistrées !`);
-    const Toast = Swal.mixin({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.onmouseenter = Swal.stopTimer;
-        toast.onmouseleave = Swal.resumeTimer;
-      },
-    });
-    Toast.fire({
-      icon: 'success',
-      title: 'Signed in successfully',
-    });
+  const handleSaveClick = () => {
+    // Envoie une requête POST pour sauvegarder les modifications des configurations
+    httpClient.post('/api/configurations', configurations)
+        .then(response => {
+            // Gérer la réponse du serveur si nécessaire
+            console.log('Configurations saved successfully:', response.data);
+            // Affiche une notification de succès
+            Swal.fire({
+                icon: 'success',
+                title: 'Configurations saved successfully',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        })
+        .catch(error => {
+            // Gérer les erreurs
+            console.error('Error saving configurations:', error);
+            // Affiche une notification d'erreur
+            Swal.fire({
+                icon: 'error',
+                title: 'Error saving configurations',
+                text: error.message
+            });
+        });
+};
+
+  const handleInputChange = (configurationIndex, paramName, newValue) => {
+    const updatedConfigurations = [...configurations];
+    updatedConfigurations[configurationIndex].values[paramName] = newValue;
+    setConfigurations(updatedConfigurations);
   };
+
+  // Autres fonctions de manipulation des configurations (ajout, suppression, etc.)
 
   return (
     <div style={{ maxWidth: '95%', height: 'auto', marginLeft: '85px' }}>
@@ -60,106 +71,25 @@ const SettingsPage = () => {
           </div>
         </div>
         <div className="page-container" >
-          <div className="section-container">
-            <h2>Retard</h2>
-            <ul>
-              {[0, 1, 2].map((index) => (
-                <li key={index}>
-                  Plus petit que:
-                  <input
-                    type="number"
-                    style={{ width: '20%' }}
-                    value={retardValues[index]}
-                    onChange={(e) => handleInputChange('retard', index, e.target.value)}
-                  />
-                </li>
-              ))}
-              <li>
-                Plus grand que:
-                <input
-                  type="number"
-                  style={{ width: '20%' }}
-                  value={retardValues[2]} // The "Plus grand que" field should be the same as the last "Plus petit que"
-                  readOnly
-                />
-              </li>
-            </ul>
-          </div>
-
-          <div className="section-container">
-            <h2>Temps Attente</h2>
-            <ul>
-              {[0, 1, 2].map((index) => (
-                <li key={index}>
-                  Plus petit que:
-                  <input
-                    type="number"
-                    style={{ width: '20%' }}
-                    value={tempsAttenteValues[index]}
-                    onChange={(e) => handleInputChange('tempsAttente', index, e.target.value)}
-                  />
-                </li>
-              ))}
-              <li>
-                Plus grand que:
-                <input
-                  type="number"
-                  style={{ width: '20%' }}
-                  value={tempsAttenteValues[2]} // The "Plus grand que" field should be the same as the last "Plus petit que"
-                  readOnly
-                />
-              </li>
-            </ul>
-          </div>
-
-          <div className="section-container">
-            <h2>Durée avant Retard</h2>
-            <ul>
-              <li>
-                temps en minutes avant retard:
-                <input
-                  type="number"
-                  style={{ width: '20%' }} />
-              </li>
-            </ul>
-          </div>
-          <div className="section-container">
-            <h2>A Venir</h2>
-            <ul>
-              
-              <li>
-                Temps avant l'heure du RDV:
-                <input
-                  type="number"
-                  style={{ width: '20%' }}
-                  value={tempsAttenteValues[0]}
-                />
-              </li>
-              <li>
-                Temps apres l'heure du RDV:
-                <input
-                  type="number"
-                  style={{ width: '20%' }}
-                  value={tempsAttenteValues[2]} // The "Plus grand que" field should be the same as the last "Plus petit que"
-                  readOnly
-                />
-              </li>
-            </ul>
-          </div>
-          <div className="section-container">
-            <h2>Avance</h2>
-            <ul>
-              <li>
-                durée avant l'etat A Venir:
-                <input
-                  type="number"
-                  style={{ width: '20%' }}
-                  value={tempsAttenteValues[0]} // The "Plus grand que" field should be the same as the last "Plus petit que"
-                  
-                />
-              </li>
-            </ul>
-          </div>
+          {/* Afficher les configurations récupérées */}
+          {configurations.map((configuration, index) => (
+            <div className="section-container" key={configuration.id}>
+              <h2>{configuration.name}</h2>
+              <ul>
+                {Object.entries(configuration.values).map(([paramName, paramValue]) => (
+                  <li key={paramName}>
+                    {paramName}:
+                    <input
+                      type="text"
+                      style={{ width: '20%' }}
+                      value={paramValue}
+                      onChange={(e) => handleInputChange(index, paramName, e.target.value)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
     </div>
