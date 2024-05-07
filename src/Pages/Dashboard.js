@@ -37,6 +37,8 @@ const Dashboard = () => {
   const [selectedState, setSelectedState] = useState(null);
   const [dateRange, setDateRange] = useState(JSON.parse(localStorage.getItem('dateRange')) || { startDate: new Date(), endDate: new Date() });
   const [dataTransfer, setDataTransfer] = useState("shesh");
+  const [visitLimit, setVisitLimit] = useState(0);
+
   useEffect(() => {
     const defaultStates = [
       { stateName: 'FENETRE', quantity: 0 },
@@ -114,6 +116,18 @@ const Dashboard = () => {
         setProducts(productsData);
 
         setLoading(false);
+
+        let station=200000
+
+        if(selectedSTOption=="ST11"){
+          station=200001
+        }
+
+        const response2 = await httpClient.get(`/api/bookings/totalOffers/${station}/${debutISO}/${finISO}`);
+        const visitLimitResponse = response2.data;
+        setVisitLimit(visitLimitResponse);
+        console.log("limite : "+visitLimit);
+
       } catch (error) {
         console.error('Error fetching data:', error);
         setLoading(false);
@@ -122,6 +136,21 @@ const Dashboard = () => {
 
     fetchData();
   }, [selectedOption, selectedSTOption, dateRange]); // Update the effect dependencies
+
+  /*useEffect(() => {
+    const fetchVisitsData = async () => {
+      try {
+        // Récupérer le nombre limite de visites
+        const response2 = await httpClient.get(`/api/bookings/totalOffers/{station}/{debut}/{fin}`);
+        const visitLimitResponse = response2.data;
+        setVisitLimit(visitLimitResponse);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchVisitsData();
+  }, []);*/
 
   useEffect(() => {
     localStorage.setItem('selectedOption', selectedOption);
@@ -303,7 +332,7 @@ const Dashboard = () => {
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '50px' }}>
         <div>
-          <div style={{border:'1px solid #ccc', display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: '20px', backgroundColor:'white'}}><h4 style={{marginTop: '10px', marginBottom:'5px'}}>Total Rendez-vous : <span style={{ color: '#2BB67D' }}>{totalRendezvousWithoutCancelled}</span> pour une limite de : <span style={{ color: '#2BB67D' }}>x</span> visites</h4></div>
+          <div style={{border:'1px solid #ccc', display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: '20px', backgroundColor:'white'}}><h4 style={{marginTop: '10px', marginBottom:'5px'}}>Total Rendez-vous : <span style={{ color: '#2BB67D' }}>{totalRendezvousWithoutCancelled}</span> pour une limite de : <span style={{ color: '#2BB67D' }}>{visitLimit}</span> visites</h4></div>
           <div className="state-container">
             {statesData.map((stateInfo, index) => (
               <StateBlock

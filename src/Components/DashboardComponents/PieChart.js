@@ -44,13 +44,42 @@ const Example = () => {
         const debutISO = debut.toISOString();
         const finISO = fin.toISOString();
         apiUrl = `/api/bookings/details/${selectedStation}/${debutISO}/${finISO}`;
-
         const response = await httpClient.get(apiUrl);
         const fetchedData = response.data;
 
+        const response1 = await httpClient.get('/api/configurations/temps attente');
+        const configValues = response1.data.values;
+        const response2 = await httpClient.get('/api/configurations/temps inspection');
+        const configValues2 = response2.data.values;
+
+        // Récupérer les valeurs param 1 et param 2
+        const param1Value = configValues['param 1'];
+        const param2Value = configValues['param 2'];
+        const param3Value = configValues['param 3'];
+        const stringparam1="<"+param1Value;
+        const stringparam2="<"+param2Value;
+        const stringparam3=">"+param3Value;
+
+        const insparam1Value = configValues2['param 1'];
+        const insparam2Value = configValues2['param 2'];
+        const insparam3Value = configValues2['param 3'];
+        const insstringparam1="<"+insparam1Value;
+        const insstringparam2="<"+insparam2Value;
+        const insstringparam3=">"+insparam3Value;
+
+       // console.log(stringparam1 + " "+stringparam2+ " "+stringparam3);
+
         const stateQuantities = {};
-        const retards = { '<15': 0, '<30': 0, '>30': 0 }; // Déclaration de la variable retards
-        const attentes = { '<15': 0, '<30': 0, '>30': 0 }; // Déclaration de la variable attentes
+        const retards = {};
+        retards[insstringparam1] = 0;
+        retards[insstringparam2] = 0;
+        retards[insstringparam3] = 0;
+        const attentes = {};
+        attentes[stringparam1] = 0;
+        attentes[stringparam2] = 0;
+        attentes[stringparam3] = 0;
+
+        //console.log(retards);
         fetchedData.forEach(item => {
           if (item.rendezVousEtat.etat !== 'ANNULE') {
             let stateName;
@@ -70,27 +99,39 @@ const Example = () => {
               const whenUpdated = new Date(item.bookingDetails.whenUpdated);
               const differenceEnMillisecondes = whenUpdated - whenCreated;
               const differenceEnMinutes = differenceEnMillisecondes / (1000 * 60);
-
-              if (differenceEnMinutes < 15) {
-                retards['<15']++;
-              } else if (differenceEnMinutes < 30) {
-                retards['<30']++;
-              } else {
-                retards['>30']++;
+              //console.log(differenceEnMinutes);
+              if (differenceEnMinutes < insparam1Value) {
+               // console.log(differenceEnMinutes+" < "+insparam1Value);
+                retards[insstringparam1]++;
+              } else if (differenceEnMinutes < insparam2Value) {
+                retards[insstringparam2]++;
+              } else if(differenceEnMinutes > insparam3Value){
+                retards[insstringparam3]++;
               }
             }
-
+            
             // Calcul pour le temps après la présentation
             if (item.rendezVousEtat.etat === 'ACCEPTE') {
-              const attente = item.rendezVousEtat.attente;
-              if (attente < 15) {
-                attentes['<15']++;
-              } else if (attente < 30) {
-                attentes['<30']++;
-              } else {
-                attentes['>30']++;
+              const heure = item.bookingDetails.heure;
+              const [heures, minutes] = heure.split(":").map(Number);
+
+              // Créer une nouvelle Date en utilisant la date actuelle
+              const dateRendezVous = new Date(item.bookingDetails.bookingdate).getTime();
+              const datePointage = new Date(item.rendezVousEtat.tempsModification).getTime();
+
+
+              const attente = datePointage-dateRendezVous;
+              const differenceEnMinutes = attente / (1000 * 60);
+
+              if (differenceEnMinutes < param1Value) {
+                attentes[stringparam1]++;
+              } else if (differenceEnMinutes < param2Value) {
+                attentes[stringparam2]++;
+              } else if(differenceEnMinutes > param3Value){
+                attentes[stringparam3]++;
               }
             }
+            
           }
         });
 
@@ -100,16 +141,19 @@ const Example = () => {
         }));
 
         setData(updatedData);
+        
         setRetardData([
-          { name: '<15', value: retards['<15'] },
-          { name: '<30', value: retards['<30'] },
-          { name: '>30', value: retards['>30'] }
+          { name: insstringparam1, value: retards[insstringparam1] },
+          { name: insstringparam2, value: retards[insstringparam2] },
+          { name: insstringparam3, value: retards[insstringparam3] }
         ]);
+        
         setAttenteData([
-          { name: '<15', value: attentes['<15'] },
-          { name: '<30', value: attentes['<30'] },
-          { name: '>30', value: attentes['>30'] }
+          { name: stringparam1, value: attentes[stringparam1] },
+          { name: stringparam2, value: attentes[stringparam2] },
+          { name: stringparam3, value: attentes[stringparam3] }
         ]);
+        
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -204,7 +248,7 @@ const Example = () => {
             <div style={{ flex: 1, marginRight: '10px' }}>
               <h5>Temps Avant Présentation (min)</h5>
               <div>
-                {retardData.map((item, index) => (
+                {attenteData.map((item, index) => (
                   <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
                     <div style={{ width: '20px', height: '20px', backgroundColor: COLORS[index], marginRight: '5px', borderRadius: '50%' }}></div>
                     <div>{item.name}</div>
@@ -216,7 +260,7 @@ const Example = () => {
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
                   <Pie
-                    data={retardData}
+                    data={attenteData}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
@@ -240,7 +284,7 @@ const Example = () => {
         <div style={{ flex: 1, marginRight: '10px' }}>
           <h5>Temps d'inspection (min)</h5>
           <div>
-            {attenteData.map((item, index) => (
+            {retardData.map((item, index) => (
               <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
                 <div style={{ width: '20px', height: '20px', backgroundColor: COLORS[index], marginRight: '5px', borderRadius: '50%' }}></div>
                 <div>{item.name}</div>
@@ -252,7 +296,7 @@ const Example = () => {
           <ResponsiveContainer width="100%" height={200}>
             <PieChart>
               <Pie
-                data={attenteData}
+                data={retardData}
                 cx="50%"
                 cy="50%"
                 labelLine={false}

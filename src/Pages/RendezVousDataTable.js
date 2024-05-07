@@ -267,6 +267,7 @@ const RendezVousDataTable = () => {
       setTypeDeVisiteOptions(response.data);
       //console.log("Options de type de visite récupérées avec succès:", response.data);
       setModalOpened(true); // Ouvrir la fenêtre modale Swal une fois que les données sont récupérées
+      //console.log("recup : "+response.data)
     } catch (error) {
       console.error('Erreur lors de la récupération des options de type de visite:', error);
     }
@@ -281,6 +282,12 @@ const RendezVousDataTable = () => {
       alertReload();
       return;
     }
+    if (!modalOpened) {
+      // Attendre que les options de type de visite soient disponibles avant d'ouvrir la fenêtre modale Swal
+      Swal.fire("Les options de type de visite ne sont pas encore disponibles. Réessayez...");
+      return;
+    }
+
 
     let lignesHTML = '';
 
@@ -298,11 +305,10 @@ const RendezVousDataTable = () => {
         html:
             '<input id="plaque" class="swal2-input" style="margin-bottom: 10px;" placeholder="Plaque">' +
             '<div style="margin-bottom: 20px;"><input type="radio" id="accordChef" name="accordType" value="accordChef" style="transform: scale(1.5);"><label for="accordChef" style="margin-left: 5px;">Accord Chef</label><input type="radio" id="erreurST" name="accordType" value="erreurST" style="transform: scale(1.5); margin-left: 20px;"><label for="erreurST" style="margin-left: 5px;">Mauvaise Station</label></div>' +
-            '<select id="choix" class="swal2-select" style="margin-bottom: 10px;">' +
-            '<option value="periodique">Periodique</option>' +
-            '<option value="occasion">Occasion</option>' +
-            '<option value="revisite">Revisite</option>' +
-            '</select>' +
+            `<select id="choix" class="swal2-select" style="margin-bottom: 10px;">
+              ${typeDeVisiteOptions.map(option => `<option value="${option}">${option}</option>`).join('')}
+            </select>` +
+
             `<div style="margin-bottom: 10px;">${lignesHTML}</div>`,
         focusConfirm: false,
         showCancelButton: true,
@@ -407,7 +413,7 @@ const RendezVousDataTable = () => {
 
     // Générez les options pour les lignes
     for (let i = 1; i <= nombreDeLignes; i++) {
-        lignesHTML += `<input type="radio" id="newLigne${i}" name="newLigne" value="${i}" style="transform: scale(1.5);" ${rowData.ligne === i.toString() ? 'checked' : ''}><label for="newLigne${i}" style="margin-left: 5px;">L${i}</label>`;
+        lignesHTML += `  <input type="radio" id="newLigne${i}" name="newLigne" value="${i}" style="transform: scale(1.5);" ${rowData.ligne === i.toString() ? 'checked' : ''}><label for="newLigne${i}" style="margin-left: 5px;"> L${i}    </label>`;
     }
 
     Swal.fire({
@@ -418,7 +424,7 @@ const RendezVousDataTable = () => {
             ${typeDeVisiteOptions.map(option => `<option value="${option}" ${rowData.typeDeVisite === option ? 'selected' : ''}>${option}</option>`).join('')}
           </select>` +
             `<div style="margin-bottom: 20px;"><input type="radio" id="newAccordChef" name="newAccordType" value="accordChef" style="transform: scale(1.5);" ${rowData.raisonRefus === 'accordChef' ? 'checked' : ''}><label for="newAccordChef" style="margin-left: 5px;">Accord Chef</label><input type="radio" id="newErreurST" name="newAccordType" value="erreurST" style="transform: scale(1.5); margin-left: 20px;" ${rowData.raisonRefus === 'erreurST' ? 'checked' : ''}><label for="newErreurST" style="margin-left: 5px;">Mauvaise Station</label></div>` +
-            `<div style="margin-bottom: 10px;">${lignesHTML}</div>`,
+            `<div style="margin-bottom: 20px;">${lignesHTML} </div>`,
         focusConfirm: false,
         showCancelButton: true,
         confirmButtonText: 'Valider',
@@ -628,6 +634,13 @@ const handleAccept = (rowData) => {
       // pour indiquer que le rendez-vous doit être récupéré.
       // Récupérer les valeurs nécessaires depuis votre endpoint API
       
+      const response1 = await httpClient.get('/api/configurations/a venir');
+      const configValues = response1.data.values;
+
+      // Récupérer les valeurs param 1 et param 2
+      const param1Value = configValues['param 1'];
+      const param2Value = configValues['param 2'];
+
 
       let et="A VENIR";
 
@@ -635,10 +648,10 @@ const handleAccept = (rowData) => {
       const heureActuelle = new Date();
 
       // Calculer l'heure actuelle moins param1Value minutes
-      const heureActuelleMoins30 = new Date(heureActuelle.getTime() - 30 * 60 * 1000);
+      const heureActuelleMoins30 = new Date(heureActuelle.getTime() - param1Value * 60 * 1000);
 
       // Calculer l'heure actuelle plus param2Value minutes
-      const heureActuellePlus30 = new Date(heureActuelle.getTime() + 30 * 60 * 1000);
+      const heureActuellePlus30 = new Date(heureActuelle.getTime() + param2Value * 60 * 1000);
       
       //console.log("param 1 : "+param1Value);
       //console.log("param 2 : "+param2Value);
