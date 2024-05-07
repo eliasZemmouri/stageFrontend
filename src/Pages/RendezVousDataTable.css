@@ -1,6 +1,9 @@
-/* RendezVousDataTable.css */
-.custom-table-container {
-    border: 1px solid #ddd;
-    padding: 10px; /* Ajustez la marge intérieure selon vos besoins */
-  }
-  
+@media (max-height:695px),(max-width:1080px){
+  .custom-table-container {
+  border: 1px solid #ddd;
+  padding: 10px; /* Ajustez la marge intérieure selon vos besoins */
+  width: 115%;
+  margin-left: -60px;
+  margin-right: -60px;
+}
+}

@@ -1,4 +1,3 @@
-// App.js
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { httpClient } from './Api/HttpClient';
@@ -20,27 +19,45 @@ const App = () => {
         window.location.reload();
       } else {
         setIsAuthenticated(true);
-        // Vérifiez si l'utilisateur a le rôle d'administrateur
         const isAdminUser = kc.hasRealmRole('admin');
         setIsAdmin(isAdminUser);
-        // Enregistrez le token dans le localStorage
         localStorage.setItem('accessToken', kc.token);
-        /* http client will use this header in every request it sends */
         httpClient.defaults.headers.common['Authorization'] = `Bearer ${kc.token}`;
+
         kc.onTokenExpired = () => {
-          console.log('token expired');
+          kc.updateToken(5).then(refreshed => {
+            if (refreshed) {
+              console.log('Token was successfully refreshed');
+              localStorage.setItem('accessToken', kc.token);
+              httpClient.defaults.headers.common['Authorization'] = `Bearer ${kc.token}`;
+            } else {
+              console.log('Token could not be refreshed');
+            }
+          }).catch(err => console.error('Failed to refresh the token', err));
         };
       }
-      setIsLoading(false); // Met à jour l'état pour indiquer que le chargement est terminé
-    }, () => {
-      /* Notify the user if necessary */
+      setIsLoading(false);
+    }).catch(() => {
       console.error('Authentication Failed');
-      setIsLoading(false); // Met à jour l'état pour indiquer que le chargement est terminé
+      setIsLoading(false);
     });
   }, []);
 
+  useEffect(() => {
+    if (isLoading) return; // Ne rien faire tant que le chargement n'est pas terminé
+    // Maintenant que le chargement est terminé, nous pouvons exécuter fetchProtectedData
+    fetchProtectedData();
+  }, [isLoading]); // Déclenche cette fonction chaque fois que l'état isLoading change
+
+  const fetchProtectedData = () => {
+    if (isAuthenticated) {
+      // Exemple de fonction pour récupérer des données protégées
+      console.log("Fetching data now...");
+      // Ajoutez ici votre logique de récupération de données
+    }
+  };
+
   if (isLoading) {
-    // Afficher un message de chargement centré si isLoading est vrai
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         Loading...

@@ -202,7 +202,7 @@ const Example = () => {
         ) : (
           <>
             <div style={{ flex: 1, marginRight: '10px' }}>
-              <h5>Temps Après Présentation (min)</h5>
+              <h5>Temps Avant Présentation (min)</h5>
               <div>
                 {retardData.map((item, index) => (
                   <div key={index} style={{ display: 'flex', alignItems: 'center' }}>

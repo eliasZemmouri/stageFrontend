@@ -9,6 +9,7 @@ import { httpClient } from '../Api/HttpClient';
 import Swal from 'sweetalert2';
 import monImage from '../images/s-a.png';
 import { kc } from '../Helpers/KeycloakHelper';
+import './RendezVousDataTable.css';
 
 const RendezVousDataTable = () => {
   const [data, setData] = useState([]);
@@ -117,8 +118,9 @@ const RendezVousDataTable = () => {
               "ligne": null
           }
       },]};*/
+      /*
       console.log(loading);
-      /*const debut = new Date(dateRange.startDate); // Utilise la date sélectionnée par l'utilisateur
+      const debut = new Date(dateRange.startDate); // Utilise la date sélectionnée par l'utilisateur
         debut.setHours(5); // Définit l'heure choisie
         debut.setMinutes(45); // Définit les minutes choisies
         debut.setSeconds(0); // Définit les secondes à zéro
@@ -135,8 +137,8 @@ const RendezVousDataTable = () => {
         const debutISO = debut.toISOString();
         const finISO = fin.toISOString();
         const apiUrl = `/api/bookings/details/${selectedST}/${debutISO}/${finISO}`;
-        pour tests local
-        */ 
+        */
+        
         const apiUrl = `/api/bookings/details/${selectedST}`;
         const response = await httpClient.get(apiUrl);
         console.log(response.data);
@@ -280,22 +282,28 @@ const RendezVousDataTable = () => {
       return;
     }
 
-    if (!modalOpened) {
-      // Attendre que les options de type de visite soient disponibles avant d'ouvrir la fenêtre modale Swal
-      Swal.fire("Les options de type de visite ne sont pas encore disponibles. Réessayez...");
-      return;
+    let lignesHTML = '';
+
+    // Déterminez le nombre de lignes en fonction de selectedST
+    const nombreDeLignes = selectedST === 'ST10' ? 8 : 5;
+
+    // Générez les options pour les lignes
+    for (let i = 1; i <= nombreDeLignes; i++) {
+        lignesHTML += `<input type="radio" id="ligne${i}" name="ligne" value="${i}" style="transform: scale(1.5); margin-left: 20px;"><label for="ligne${i}" style="margin-left: 5px;">L${i}</label>`;
     }
 
-    
     Swal.fire({
         title: 'Accepter un rendez-vous sans rendez-vous',
+        width: 600,
         html:
             '<input id="plaque" class="swal2-input" style="margin-bottom: 10px;" placeholder="Plaque">' +
             '<div style="margin-bottom: 20px;"><input type="radio" id="accordChef" name="accordType" value="accordChef" style="transform: scale(1.5);"><label for="accordChef" style="margin-left: 5px;">Accord Chef</label><input type="radio" id="erreurST" name="accordType" value="erreurST" style="transform: scale(1.5); margin-left: 20px;"><label for="erreurST" style="margin-left: 5px;">Mauvaise Station</label></div>' +
-            `<select id="choix" class="swal2-select" style="margin-bottom: 10px;">
-              ${typeDeVisiteOptions.map(option => `<option value="${option}">${option}</option>`).join('')}
-            </select>` +
-            '<div style="margin-bottom: 10px;"><input type="radio" id="ligne1" name="ligne" value="1" style="transform: scale(1.5);"><label for="ligne1" style="margin-left: 5px;">Ligne 1</label><input type="radio" id="ligne2" name="ligne" value="2" style="transform: scale(1.5); margin-left: 20px;"><label for="ligne2" style="margin-left: 5px;">Ligne 2</label><input type="radio" id="ligne3" name="ligne" value="3" style="transform: scale(1.5); margin-left: 20px;"><label for="ligne3" style="margin-left: 5px;">Ligne 3</label><input type="radio" id="ligne3" name="ligne" value="4" style="transform: scale(1.5); margin-left: 20px;"><label for="ligne4" style="margin-left: 5px;">Ligne 4</label><input type="radio" id="ligne3" name="ligne" value="5" style="transform: scale(1.5); margin-left: 20px;"><label for="ligne5" style="margin-left: 5px;">Ligne 5</label></div>',
+            '<select id="choix" class="swal2-select" style="margin-bottom: 10px;">' +
+            '<option value="periodique">Periodique</option>' +
+            '<option value="occasion">Occasion</option>' +
+            '<option value="revisite">Revisite</option>' +
+            '</select>' +
+            `<div style="margin-bottom: 10px;">${lignesHTML}</div>`,
         focusConfirm: false,
         showCancelButton: true,
         confirmButtonText: 'Ajouter',
@@ -358,6 +366,7 @@ const RendezVousDataTable = () => {
 
 
 
+
   const renderStateButton = (state) => (
     <button
       key={state.value}
@@ -381,73 +390,85 @@ const RendezVousDataTable = () => {
 
 
   const handleModify = (rowData) => {
-    if(!droitAction){
-      alertReload();
-      return;
+    if (!droitAction) {
+        alertReload();
+        return;
     }
     if (!modalOpened) {
-      // Attendre que les options de type de visite soient disponibles avant d'ouvrir la fenêtre modale Swal
-      Swal.fire("Les options de type de visite ne sont pas encore disponibles. Réessayez...");
-      return;
+        // Attendre que les options de type de visite soient disponibles avant d'ouvrir la fenêtre modale Swal
+        Swal.fire("Les options de type de visite ne sont pas encore disponibles. Réessayez...");
+        return;
     }
+
+    let lignesHTML = '';
+
+    // Déterminez le nombre de lignes en fonction de selectedST
+    const nombreDeLignes = selectedST === 'ST10' ? 8 : 5;
+
+    // Générez les options pour les lignes
+    for (let i = 1; i <= nombreDeLignes; i++) {
+        lignesHTML += `<input type="radio" id="newLigne${i}" name="newLigne" value="${i}" style="transform: scale(1.5);" ${rowData.ligne === i.toString() ? 'checked' : ''}><label for="newLigne${i}" style="margin-left: 5px;">L${i}</label>`;
+    }
+
     Swal.fire({
-      title: 'Modifier le Sans Rendez-Vous',
-      html:
-        `<input id="newPlaque" class="swal2-input" style="margin-bottom: 10px;" placeholder="Nouvelle Plaque" value="${rowData.plaque}">` +
-        `<select id="newType" class="swal2-select" style="margin-bottom: 10px;">
-          ${typeDeVisiteOptions.map(option => `<option value="${option}" ${rowData.typeDeVisite === option ? 'selected' : ''}>${option}</option>`).join('')}
-        </select>` +
-        `<div style="margin-bottom: 20px;"><input type="radio" id="newAccordChef" name="newAccordType" value="accordChef" style="transform: scale(1.5);" ${rowData.raisonRefus === 'accordChef' ? 'checked' : ''}><label for="newAccordChef" style="margin-left: 5px;">Accord Chef</label><input type="radio" id="newErreurST" name="newAccordType" value="erreurST" style="transform: scale(1.5); margin-left: 20px;" ${rowData.raisonRefus === 'erreurST' ? 'checked' : ''}><label for="newErreurST" style="margin-left: 5px;">Mauvaise Station</label></div>` +
-            `<div style="margin-bottom: 10px;"><input type="radio" id="newLigne1" name="newLigne" value="1" style="transform: scale(1.5);" ${rowData.ligne === '1' ? 'checked' : ''}><label for="newLigne1" style="margin-left: 5px;">Ligne 1</label><input type="radio" id="newLigne2" name="newLigne" value="2" style="transform: scale(1.5); margin-left: 20px;" ${rowData.ligne === '2' ? 'checked' : ''}><label for="newLigne2" style="margin-left: 5px;">Ligne 2</label><input type="radio" id="newLigne3" name="newLigne" value="3" style="transform: scale(1.5); margin-left: 20px;" ${rowData.ligne === '3' ? 'checked' : ''}><label for="newLigne3" style="margin-left: 5px;">Ligne 3</label><input type="radio" id="newLigne4" name="newLigne" value="4" style="transform: scale(1.5); margin-left: 20px;" ${rowData.ligne === '4' ? 'checked' : ''}><label for="newLigne4" style="margin-left: 5px;">Ligne 4</label><input type="radio" id="newLigne5" name="newLigne" value="5" style="transform: scale(1.5); margin-left: 20px;" ${rowData.ligne === '5' ? 'checked' : ''}><label for="newLigne5" style="margin-left: 5px;">Ligne 5</label></div>`,
-      focusConfirm: false,
-      showCancelButton: true,
-      confirmButtonText: 'Valider',
-      preConfirm: () => {
-        const newPlaque = document.getElementById('newPlaque').value;
-        const newType = document.getElementById('newType').value;
-        const newAccordTypeElement = document.querySelector('input[name="newAccordType"]:checked');
-        const newAccordType = newAccordTypeElement ? newAccordTypeElement.value : null;
-        const newRaison = newAccordType;
-        const newLigneElement = document.querySelector('input[name="newLigne"]:checked');
+        title: 'Modifier le Sans Rendez-Vous',
+        html:
+            `<input id="newPlaque" class="swal2-input" style="margin-bottom: 10px;" placeholder="Nouvelle Plaque" value="${rowData.plaque}">` +
+            `<select id="newType" class="swal2-select" style="margin-bottom: 10px;">
+            ${typeDeVisiteOptions.map(option => `<option value="${option}" ${rowData.typeDeVisite === option ? 'selected' : ''}>${option}</option>`).join('')}
+          </select>` +
+            `<div style="margin-bottom: 20px;"><input type="radio" id="newAccordChef" name="newAccordType" value="accordChef" style="transform: scale(1.5);" ${rowData.raisonRefus === 'accordChef' ? 'checked' : ''}><label for="newAccordChef" style="margin-left: 5px;">Accord Chef</label><input type="radio" id="newErreurST" name="newAccordType" value="erreurST" style="transform: scale(1.5); margin-left: 20px;" ${rowData.raisonRefus === 'erreurST' ? 'checked' : ''}><label for="newErreurST" style="margin-left: 5px;">Mauvaise Station</label></div>` +
+            `<div style="margin-bottom: 10px;">${lignesHTML}</div>`,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Valider',
+        preConfirm: () => {
+            const newPlaque = document.getElementById('newPlaque').value;
+            const newType = document.getElementById('newType').value;
+            const newAccordTypeElement = document.querySelector('input[name="newAccordType"]:checked');
+            const newAccordType = newAccordTypeElement ? newAccordTypeElement.value : null;
+            const newRaison = newAccordType;
+            const newLigneElement = document.querySelector('input[name="newLigne"]:checked');
             const newLigne = newLigneElement ? newLigneElement.value : null;
-        if (!newPlaque || !newType || !newRaison || !newLigne) {
-          Swal.showValidationMessage('Veuillez remplir tous les champs.');
-          return false;
+            if (!newPlaque || !newType || !newRaison || !newLigne) {
+                Swal.showValidationMessage('Veuillez remplir tous les champs.');
+                return false;
+            }
+            return { newPlaque, newType, newRaison, newLigne };
         }
-        return { newPlaque, newType, newRaison, newLigne };
-      }
     }).then((result) => {
-      if (result.isConfirmed) {
-        const { newPlaque, newType, newRaison, newLigne } = result.value;
-        // Make the API call to update the sans rendez-vous appointment
-        httpClient.post(`/api/sansRendezVous/modification/${rowData.id}/${newPlaque}/${newType}/${newRaison}/${newLigne}`)
-          .then(() => {
-            // Update the UI if the API call was successful
-            const updatedData = data.map(item => {
-              if (item.id === rowData.id) {
-                return { ...item, plaque: newPlaque, typeDeVisite: newType, raisonRefus: newRaison,  ligne: newLigne };
-              }
-              return item;
-            });
-            setData(updatedData);
-            Swal.fire({
-              position: 'center',
-              icon: 'success',
-              title: 'Rendez-vous modifié avec succès!',
-              showConfirmButton: false,
-              timer: 1500
-            });
-          })
-          .catch(error => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Erreur',
-              text: error.message
-            });
-          });
-      }
+        if (result.isConfirmed) {
+            const { newPlaque, newType, newRaison, newLigne } = result.value;
+            // Make the API call to update the sans rendez-vous appointment
+            httpClient.post(`/api/sansRendezVous/modification/${rowData.id}/${newPlaque}/${newType}/${newRaison}/${newLigne}`)
+                .then(() => {
+                    // Update the UI if the API call was successful
+                    const updatedData = data.map(item => {
+                        if (item.id === rowData.id) {
+                            return { ...item, plaque: newPlaque, typeDeVisite: newType, raisonRefus: newRaison, ligne: newLigne };
+                        }
+                        return item;
+                    });
+                    setData(updatedData);
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Rendez-vous modifié avec succès!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erreur',
+                        text: error.message
+                    });
+                });
+        }
     });
-  };
+};
+
 
 const actionButtons = (rowData) => {
   if (rowData.etat === 'ACCEPTE' || rowData.etat === 'REFUSE') {
@@ -479,61 +500,63 @@ const actionButtons = (rowData) => {
 
   
 
-  const handleAccept = (rowData) => {
-    if(!droitAction){
+const handleAccept = (rowData) => {
+  if (!droitAction) {
       alertReload();
       return;
-    }
-    Swal.fire({
+  }
+
+  let inputOptions = {};
+
+  // Déterminez le nombre de lignes en fonction de selectedST
+  const nombreDeLignes = selectedST === 'ST10' ? 8 : 5;
+
+  // Générez les options pour les lignes
+  for (let i = 1; i <= nombreDeLignes; i++) {
+      inputOptions[i] = `L${i}`;
+  }
+
+  Swal.fire({
       title: 'Accepter la réservation',
       text: 'Veuillez sélectionner une Ligne:',
       input: 'radio',
-      inputOptions: {
-        '1': 'L1',
-        '2': 'L2',
-        '3': 'L3',
-        '4': 'L4',
-        '5': 'L5'
-      },
+      inputOptions: inputOptions,
       inputValidator: (value) => {
-        if (!value) {
-          return 'Vous devez choisir une Ligne!';
-        }
+          if (!value) {
+              return 'Vous devez choisir une Ligne!';
+          }
       }
-    }).then(async (result) => {
-      
+  }).then(async (result) => {
       if (result.isConfirmed) {
-        try{
-          const Ligne = result.value;
-          const response = await httpClient.post(`/api/bookings/accepter/${rowData.id}`, {Ligne} );
-          
-          Swal.fire({
-            position: "center",
-            icon: "success",
-            title: response.data,
-            showConfirmButton: false,
-            timer: 1000
-          });
-          // Mettre à jour l'état du rendez-vous refusé dans le tableau de données
-          const updatedData = data.map(item => {
-            if (item.id === rowData.id) {
-              return { ...item, etat: 'ACCEPTE', ligne: Ligne };
-            }
-            return item;
-          });
-          setData(updatedData);
-        }
-        catch (error) {
-          console.error('Erreur lors de l\'appel de l\'API:', error);
-          // Afficher un message d'erreur ou effectuer d'autres actions en cas d'erreur
-          Swal.fire('Erreur', "Une erreur s'est produite lors de l'acceptation du rendez-vous.", 'error');
-        }
-        
-        
+          try {
+              const Ligne = result.value;
+              const response = await httpClient.post(`/api/bookings/accepter/${rowData.id}`, { Ligne });
+
+              Swal.fire({
+                  position: "center",
+                  icon: "success",
+                  title: response.data,
+                  showConfirmButton: false,
+                  timer: 1000
+              });
+              // Mettre à jour l'état du rendez-vous refusé dans le tableau de données
+              const updatedData = data.map(item => {
+                  if (item.id === rowData.id) {
+                      return { ...item, etat: 'ACCEPTE', ligne: Ligne };
+                  }
+                  return item;
+              });
+              setData(updatedData);
+          } catch (error) {
+              console.error('Erreur lors de l\'appel de l\'API:', error);
+              // Afficher un message d'erreur ou effectuer d'autres actions en cas d'erreur
+              Swal.fire('Erreur', "Une erreur s'est produite lors de l'acceptation du rendez-vous.", 'error');
+          }
       }
-    });
-    console.log('Accept:', rowData);
-  };
+  });
+  console.log('Accept:', rowData);
+};
+
 
   const handleReject =async (rowData) => {
     if(!droitAction){
@@ -603,16 +626,23 @@ const actionButtons = (rowData) => {
       // Effectuez ici l'appel à l'API pour gérer la récupération du rendez-vous
       // Par exemple, vous pouvez appeler votre endpoint API avec l'ID du rendez-vous
       // pour indiquer que le rendez-vous doit être récupéré.
+      // Récupérer les valeurs nécessaires depuis votre endpoint API
+      
+
       let et="A VENIR";
 
       // Heure actuelle
       const heureActuelle = new Date();
 
-      // Calculer l'heure actuelle moins 15 minutes
-      const heureActuelleMoins30 = new Date(heureActuelle.getTime() - 30 * 60 * 1000); // 15 minutes en millisecondes
+      // Calculer l'heure actuelle moins param1Value minutes
+      const heureActuelleMoins30 = new Date(heureActuelle.getTime() - 30 * 60 * 1000);
 
-      // Calculer l'heure actuelle plus 15 minutes
-      const heureActuellePlus30 = new Date(heureActuelle.getTime() + 30 * 60 * 1000); // 15 minutes en millisecondes
+      // Calculer l'heure actuelle plus param2Value minutes
+      const heureActuellePlus30 = new Date(heureActuelle.getTime() + 30 * 60 * 1000);
+      
+      //console.log("param 1 : "+param1Value);
+      //console.log("param 2 : "+param2Value);
+      
 
       // Extraire les heures et les minutes de rowData.heure
       const [rowDataHeureHeure, rowDataHeureMinute] = rowData.heure.split(':').map(Number);
@@ -660,13 +690,15 @@ const actionButtons = (rowData) => {
   };
   
   //le max pour zommer la table
-  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth >= 2100);
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth == 1080  && window.innerHeight == 695);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsSmallScreen(window.innerWidth >= 2100);
+      setIsSmallScreen(window.innerWidth == 1080 && window.innerHeight == 695);
     };
-
+    //window.alert(window.innerWidth + " : "+window.innerHeight + " AND " +isSmallScreen);
+    //1080 : 695
+    
     window.addEventListener('resize', handleResize);
 
     return () => {
@@ -746,7 +778,7 @@ const actionButtons = (rowData) => {
                       return row.etat === selectedState.toUpperCase();
                     }
                   })}
-                  tableStyle = {{ zoom: isSmallScreen ? '0.5' : '1' }}
+                  tableStyle = {{ zoom: isSmallScreen ? '0.6' : '1', width: '100%' }}
                   loading = {loading}
                   stripedRows
                   className="p-datatable-striped"
@@ -755,18 +787,19 @@ const actionButtons = (rowData) => {
                   globalFilter={globalFilter}
                   header={globalFilterElement}
                   emptyMessage="Aucun rendez-vous trouvé."
+                  size='small'
                 >
-                  <Column field="heure" header="Heure" style={{ width: '5%' }} body={rowData => rowData.heure || '-'} />
-                  <Column field="id" header="RDV" style={{ width: '3%' }} body={rowData => rowData.id || '-'} />
-                  <Column field="typeDeVisite" header="Type de Visite" style={{ width: '10%' }} body={rowData => rowData.typeDeVisite || '-'} />
-                  <Column field="plaque" header="Plaque" style={{ width: '8%' }} body={rowData => rowData.plaque || '-'} />
-                  <Column field="chassis" header="Chassis" style={{ width: '5%' }} body={rowData => rowData.chassis || '-'} />
-                  <Column field="vehicule" header="Véhicule" style={{ width: '15%' }} body={rowData => rowData.vehicule || '-'} />
-                  <Column field="client" header="Client" style={{ width: '15%' }} body={rowData => rowData.client || '-'} />
-                  <Column field="source" header="Source" style={{ width: '6%' }} body={rowData => rowData.source || '-'} />
-                  <Column field="ligne" header="Ligne" style={{ width: '2%' }} body={rowData => rowData.ligne || '-'} />
-                  <Column field="raisonRefus" header="Raison" style={{ width: '5%' }} body={rowData => rowData.raisonRefus || '-'} />
-                  <Column field="actions" header="Actions" style={{ width: '23%' }} body={actionButtons} />
+                  <Column field="heure" header="Heure" body={rowData => rowData.heure || '-'} />
+                  <Column field="id" header="RDV"  body={rowData => rowData.id || '-'} />
+                  <Column field="typeDeVisite" header="Type de Visite"  body={rowData => rowData.typeDeVisite || '-'} />
+                  <Column field="plaque" header="Plaque"  body={rowData => rowData.plaque || '-'} />
+                  <Column field="chassis" header="Chassis"  body={rowData => rowData.chassis || '-'} />
+                  <Column field="vehicule" header="Véhicule"  body={rowData => rowData.vehicule || '-'} />
+                  <Column field="client" header="Client"  body={rowData => rowData.client || '-'} />
+                  <Column field="source" header="Source"  body={rowData => rowData.source || '-'} />
+                  <Column field="ligne" header="Ligne"  body={rowData => rowData.ligne || '-'} />
+                  <Column field="raisonRefus" header="Raison"  body={rowData => rowData.raisonRefus || '-'} />
+                  <Column field="actions" header="Actions"  body={actionButtons} />
                 </DataTable>
               </div>
             </div>

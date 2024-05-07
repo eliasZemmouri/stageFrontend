@@ -45,5 +45,36 @@
     }
   }
 
-  
-  
+
+/* PieChart */
+/* CSS pour les boîtes conteneurs */
+.container-box {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  padding: 20px;
+  margin-right: 3%;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+}
+
+/* CSS pour les éléments internes */
+.inner-element {
+  flex: 1;
+  margin-right: 10px;
+}
+
+/* CSS pour les éléments avec des cercles de couleur */
+.color-circle {
+  width: 20px;
+  height: 20px;
+  background-color: #0088FE;
+  margin-right: 5px;
+  border-radius: 50%;
+}
+
+/* CSS pour les titres */
+.title {
+  margin-bottom: 10px;
+}
